@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 var TestWriteSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -7,4 +7,4 @@ var TestWriteSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = TestWriteSchema;
+export {TestWriteSchema};

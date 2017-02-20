@@ -1,13 +1,13 @@
-var mongoose = require('mongoose'),
-    config = require('./../config'),
-    // logger = require('./../components/Logger'),
-    async = require('async'),
-    Model = require('./../component/Model'),
-    _ = require('lodash');
+import mongoose from 'mongoose';
+import config from './../config';
+import async from 'async';
+import * as _ from 'lodash';
+import * as Model from './../component/Model';
 
-    mongoose.Promise = global.Promise;
+import {TestWriteSchema} from './write/test'
 
-var db = {},
+let dbList = {};
+let db = {},
   connect = function(connectionString, name) {
     db[name] = mongoose.createConnection(connectionString, {
       server : {
@@ -63,9 +63,9 @@ _.keys(db).forEach(function(dbType) {
   Model.extendMongoose(dbType);
 });
 
-var models = {
+let models = {
   write: {
-    Test:     db.write.model('test',      require('./write/test')),
+    Test:     db.write.model('test',TestWriteSchema),
   },
   read: {
   },
@@ -76,23 +76,25 @@ var models = {
 // add db getters
 // ex: UserWrite = db.write('User')
 _.keys(db).forEach(function(dbType) {
-  exports[dbType] = function(model) {
+  dbList[dbType] = function(model) {
     return models[dbType][model] ? models[dbType][model][dbType]() : null;
   };
 });
 
-exports.isObjectId = function(token) {
+dbList.isObjectId = function(token) {
   return mongoose.Types.ObjectId.isValid(token);
 };
 
-exports.toObjectId = function(id) {
-  return exports.isObjectId(id) ? mongoose.Types.ObjectId(id) : null;
+dbList.toObjectId = function(id) {
+  return dbList.isObjectId(id) ? mongoose.Types.ObjectId(id) : null;
 };
 
-exports.drop = function(callback) {
+dbList.drop = function(callback) {
   async.each(_.toArray(db), function(connection, callback) {
     async.each(_.toArray(connection.collections), function(collection, callback) {
       collection.drop(callback);
     }, callback);
   }, callback);
 };
+
+export {dbList};

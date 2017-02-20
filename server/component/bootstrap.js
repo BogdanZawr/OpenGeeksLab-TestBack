@@ -1,11 +1,11 @@
-let path = require('path')
-  , fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
 let _parse = (initPath, callback) => {
 
   fs.readdirSync(initPath).forEach((name) => {
 
-    var itemPath = path.join(initPath, name)
+    let itemPath = path.join(initPath, name)
       , stat = fs.statSync(itemPath);
 
     if (stat && stat.isDirectory(itemPath)) {
@@ -18,8 +18,8 @@ let _parse = (initPath, callback) => {
   });
 }
 
-module.exports = {
-  routes : (application) => {
+class bootstrap {
+  routes(application) {
     _parse(path.join(__dirname, '..', 'route'), (itemPath) => {
       let router = require(itemPath);
 
@@ -27,10 +27,15 @@ module.exports = {
         .use(router.routes())
         .use(router.allowedMethods());
         });
-  },
-  events : () => {
-    _parse(path.join(__dirname, '..', 'handlers'), (itemPath, name) => {
+  }
+
+  events (){
+    _parse(path.join(__dirname, '..', 'handler'), (itemPath, name) => {
       require(itemPath);
     });
   }
 }
+
+let boot = new bootstrap()
+
+export {boot}

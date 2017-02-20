@@ -1,33 +1,44 @@
-var mongoose = require('mongoose'),
-  EventBus = require('./EventBus'),
-  async = require('async'),
-  util = require('util'),
-  okay = require('okay'),
-  _ = require('lodash')
+import mongoose from 'mongoose';
+import * as _ from 'lodash';
+import util  from 'util';
+import q  from 'q';
+import {EventBus}  from './EventBus';
 
 // extensions based on database type (read|write|static)
-module.exports.extendMongoose = function(dbType) {
+let extendMongoose = (dbType) => {
   mongoose.Model[dbType] = function() {
-    var self = this;
+    let self = this;
     return {
-      updateRow : function(query, data, callback, options) {
-        var params = _.pick(options, 'executor');
+      updateRow : (query, data, callback, options) => {
+        let deferred = q.defer();
+        let params = _.pick(options, 'executor');
 
-        var Model = self,
-          options = options || {},
+        let Model = self,
           evtName = util.format('%s.%sUpdated', dbType, Model.modelName);
 
-        Model.findOne(query, okay(callback, function(doc) {
+        options = options || {},
+
+        Model.findOne(query, (err, doc) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
+          }
+
           if (!doc) {
-            var message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
-            return callback(new Error(message));
+            let message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
+            return callback && callback(new Error(message));
           }
 
 
 
           _.extend(doc, _.omit(data, '__v'));
-          doc.save(okay(callback, function(item, affected) {
-            var item = item.toObject();
+          doc.save((err, item, affected) => {
+            if (err) {
+              callback && callback(err);
+              return deferred.reject(err);
+            }
+
+            item = item.toObject();
 
             if (!_.isEmpty(params)){
               params.data = item;
@@ -35,42 +46,68 @@ module.exports.extendMongoose = function(dbType) {
             }
 
             !options.disableEvents && EventBus.emit(evtName + (options.hiddenEvents ? options.eventSuffix || 'Hidden' : ''), item);
-            callback(null, item, affected);
-          }));
-        }));
+            callback && callback(null, item, affected);
+            deferred.resolve({
+              item: item,
+              affected: affected,
+            });
+          });
+        });
       },
 
-      insertRow : function(entity, callback, options) {
-        var params = _.pick(options, 'executor');
-        var Model = self,
+      insertRow : (entity, callback, options) => {
+        let deferred = q.defer();
+        let params = _.pick(options, 'executor');
+        let Model = self,
           evtName = util.format('%s.%sInserted', dbType, Model.modelName);
 
-        var doc = new Model(entity);
-        doc.save(okay(callback, function(item, affected) {
-          var item = item.toObject();
+        let doc = new Model(entity);
+        doc.save((err,item, affected) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
+          }
+
+          item = item.toObject();
           if (!_.isEmpty(params)){
             params.data = item;
             item = params;
           }
           EventBus.emit(evtName, item);
-          callback(null, item, affected);
-        }));
+          callback && callback(null, item, affected);
+          deferred.resolve({
+            item: item,
+            affected: affected,
+          });
+        });
+
+        return deferred.promise;
       },
 
-      deleteRow : function(query, callback, options) {
-        var params = _.pick(options, 'executor');
+      deleteRow : (query, callback, options) => {
+        let deferred = q.defer();
+        let params = _.pick(options, 'executor');
 
-        var Model = self,
+        let Model = self,
           evtName = util.format('%s.%sDeleted', dbType, Model.modelName);
 
-        Model.findOne(query, okay(callback, function(doc) {
-          if (!doc) {
-            var message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
-            return callback(new Error(message));
+        Model.findOne(query, (err,doc) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
           }
 
-          doc.remove(okay(callback, function() {
-            var item = doc.toObject();
+          if (!doc) {
+            let message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
+            return callback && callback(new Error(message));
+          }
+
+          doc.remove((err) => {
+            if (err) {
+              callback && callback(err);
+              return deferred.reject(err);
+            }
+            let item = doc.toObject();
 
             if (!_.isEmpty(params)){
               params.data = item;
@@ -78,64 +115,78 @@ module.exports.extendMongoose = function(dbType) {
             }
 
             EventBus.emit(evtName, item);
-            callback(null, item);
-          }));
-        }));
+            callback && callback(null, item);
+            deferred.resolve(item);
+          });
+        });
+
+        return deferred.promise;
       },
 
-      updateRows : function(query, data, options, callback) {
-        var _options = { multi : true };
+      updateRows : (query, data, options, callback) => {
+        let _options = { multi : true };
         if (!callback) {
           callback = options;
           options = _options;
         }
 
         options = _.extend(options, _options);
-        self.update(query, data, options, callback);
+        return self.update(query, data, options, callback);
       },
 
-      deleteRows : function(query, callback) {
-        self.remove(query, callback);
+      deleteRows : (query, callback) => {
+        return self.remove(query, callback);
       },
 
-      countRows : function(query, callback) {
-        self.count(query, callback);
+      countRows : (query, callback) => {
+        return self.count(query, callback);
       },
 
-      rowExists : function(query, callback) {
-        self.count(query, okay(callback, function(count) {
-          callback(null, count > 0);
-        }));
+      rowExists : (query, callback) => {
+        let deferred = q.defer();
+        self.count(query, (err,count) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
+          }
+          callback && callback(null, count > 0);
+          deferred.resolve(count > 0);
+        });
+
+        return deferred.promise;
       },
 
-      aggregateRows : function(pipeline, callback){
-        self.aggregate(pipeline).allowDiskUse(true).exec(callback);
+      aggregateRows : (pipeline, callback) => {
+        return self.aggregate(pipeline).allowDiskUse(true).exec(callback);
       },
 
-      populate : function(items, options, callback) {
-        self.populate(items, options, callback);
+      populate : (items, options, callback) => {
+        return self.populate(items, options, callback);
       },
 
-      findRows : function(query, callback) {
-        self.find(query).lean().exec(callback);
+      findRows : (query, callback) => {
+        return self.find(query).lean().exec(callback);
       },
 
-      findRow : function(query, callback) {
-        self.findOne(query).lean().exec(callback);
+      findRow : (query, callback) => {
+        return self.findOne(query).lean().exec(callback);
       },
 
-      findDocs : function(query, callback) {
-        self.find(query).exec(callback);
+      findDocs : (query, callback) => {
+        return self.find(query).exec(callback);
       },
 
-      findDoc : function(query, callback) {
-        self.findOne(query).exec(callback);
+      findDoc : (query, callback) => {
+        return self.findOne(query).exec(callback);
       },
 
-      findWithOptions : function(query, options, callback) {
-        var Query = self.find(query),
-          callback = callback || options,
-          options = options && typeof options !== 'function' ? options : {};
+      findWithOptions : (query, options, callback) => {
+        let deferred = q.defer();
+
+        let Query = self.find(query);
+        options = options && typeof options !== 'function' ? options : {};
+
+        callback = callback || options,
 
         _.defaults(options, {
           limit: 40,
@@ -147,35 +198,53 @@ module.exports.extendMongoose = function(dbType) {
         }
 
         if (options.sort) {
-          var sort = typeof options.sort === 'string' ? JSON.parse(options.sort) : options.sort;
+          let sort = typeof options.sort === 'string' ? JSON.parse(options.sort) : options.sort;
           Query = Query.sort(sort || {});
         }
 
-        var pageNumber = parseInt(options.pageNumber);
+        let pageNumber = parseInt(options.pageNumber);
         if (pageNumber && pageNumber > 0) {
           skip = (pageNumber - 1) * options.limit;
           Query =  Query.skip(skip).limit(options.limit);
         }
 
-        Query.lean().exec(okay(callback, function(results) {
-          if (!options.pageNumber) {
-            return callback(null, results);
+        Query.lean().exec((err, results) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
           }
 
-          self.count(query, okay(callback, function(count) {
-            callback(null, {
+          if (!options.pageNumber) {
+            return callback && callback(null, results);
+          }
+
+          self.count(query, (err,count) => {
+            if (err) {
+              callback && callback(err);
+              return deferred.reject(err);
+            }
+            callback && callback(null, {
               pagesCount: Math.ceil(count / options.limit) || 1,
               results: results,
               totalCount: count
             });
-          }));
-        }));
+            deferred.resolve( {
+              pagesCount: Math.ceil(count / options.limit) || 1,
+              results: results,
+              totalCount: count
+            });
+          });
+        });
+
+        return deferred.promise;
       },
 
-      aggregateWithOptions : function(query, options, callback) {
-        var callback = callback || options,
-          options = options && typeof options !== 'function' ? options : {};
-          var countquery  = [].concat(query, {$group :{_id:"1", count: { $sum: 1 }}});
+      aggregateWithOptions : (query, options, callback) => {
+        let deferred = q.defer();
+
+        callback = callback || options,
+        options = options && typeof options !== 'function' ? options : {};
+        let countquery  = [].concat(query, {$group :{_id:"1", count: { $sum: 1 }}});
 
         _.defaults(options, {
           limit: 40,
@@ -183,47 +252,73 @@ module.exports.extendMongoose = function(dbType) {
         });
 
         if (options.sort) {
-            var sort = typeof options.sort === 'string' ? JSON.parse(options.sort) : options.sort;
-            _.each(sort, function(value, key) {
-              sort[key] = value == 'asc' ? 1 : -1;
-            });
-            !_.isEmpty(sort) && query.push({ $sort : sort });
-          }
+          let sort = typeof options.sort === 'string' ? JSON.parse(options.sort) : options.sort;
+          _.each(sort, (value, key) => {
+            sort[key] = value == 'asc' ? 1 : -1;
+          });
+          !_.isEmpty(sort) && query.push({ $sort : sort });
+        }
 
-        var limit = parseInt(options.limit);
+        let limit = parseInt(options.limit);
 
         if (options.pageNumber > 0) {
-            query.push({ $skip :  (options.pageNumber - 1) * options.limit });
-          }
+          query.push({ $skip :  (options.pageNumber - 1) * options.limit });
+        }
 
         if (limit) {
           query.push({ $limit : limit });
         }
 
 
-        self.aggregate(query).allowDiskUse(true).exec(okay(callback, function(results) {
-          if (!options.pageNumber) {
-            return callback(null, results);
+        self.aggregate(query).allowDiskUse(true).exec((err, results) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
           }
 
+          if (!options.pageNumber) {
+            return callback && callback(null, results);
+          }
 
+          self.aggregate(countquery).allowDiskUse(true).exec((err,count) => {
+            if (err) {
+              callback && callback(err);
+              return deferred.reject(err);
+            }
 
-          self.aggregate(countquery).allowDiskUse(true).exec(okay(callback, function(count) {
             if (!_.isEmpty(count)){
-            return callback(null, {
-              pagesCount: Math.ceil(count[0].count / options.limit) || 1,
+              callback && callback(null, {
+                pagesCount: Math.ceil(count[0].count / options.limit) || 1,
                 results: results,
                 totalCount: count[0].count
-            });
+              });
+
+              return deferred.resolve( {
+                pagesCount: Math.ceil(count[0].count / options.limit) || 1,
+                results: results,
+                totalCount: count[0].count
+              });
             }
-            callback(null, results);
-          }));
 
+            callback && callback(null, {
+              pagesCount: 0,
+              results: [],
+              totalCount: 0
+            });
 
+            deferred.resolve( {
+              pagesCount: 0,
+              results: [],
+              totalCount: 0
+            });
+          });
+        });
 
-        }));
-
+        return deferred.promise;
       }
     };
   };
 };
+
+
+export {extendMongoose}

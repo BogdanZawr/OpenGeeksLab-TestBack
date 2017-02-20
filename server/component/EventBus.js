@@ -1,69 +1,67 @@
-var EventEmitter = require('events').EventEmitter
-  , _ = require('lodash')
-  , util = require('util');
+import * as _ from 'lodash';
+import util  from 'util';
+import EventEmitter  from 'events';
 
-function EventBus() {
-  EventEmitter.call(this);
-  this.queue = [];
-  this.useQueue = [];
-  this.current = this.nest = null;
-}
+class EventBusObj {
+  constructor () {
+    EventEmitter.call(this);
+    this.queue = [];
+    this.useQueue = [];
+    this.current = this.nest = null;
+  }
 
-util.inherits(EventBus, EventEmitter);
+  emit (eventName) {
+    let self = this
+      , args = arguments;
 
-EventBus.create = function() {
-  return new EventBus();
-};
+    console.log('Emitting ' + eventName + '...');
+    if (~eventName.indexOf('::')) {
+        let nest = function(eventName, level) {
+          let tmpEvent = eventName.split('::', level).join('::');
+          EventEmitter.prototype.emit.apply(self, [tmpEvent].concat([].slice.call(args, 1)).concat([function(err) {
+            if (err) {
+              return console.log(err);
+            }
 
-EventBus.prototype.emit = function(eventName) {
-  var self = this
-    , args = arguments;
+            tmpEvent != eventName && nest(eventName, ++level);
+          }]));
+        };
 
-  console.log('Emitting ' + eventName + '...');
-  if (~eventName.indexOf('::')) {
-      var nest = function(eventName, level) {
-        var tmpEvent = eventName.split('::', level).join('::');
-        EventEmitter.prototype.emit.apply(self, [tmpEvent].concat([].slice.call(args, 1)).concat([function(err) {
-          if (err) {
-            return console.log(err);
-          }
+        nest(eventName, 1);
+    } else {
+      return EventEmitter.prototype.emit.apply(this, arguments);
+    }
+  }
 
-          tmpEvent != eventName && nest(eventName, ++level);
-        }]));
-      };
+  use (eventName, listener) {
+    this.useQueue.push(eventName);
+    this.onSeries(eventName, listener);
+  }
 
-      nest(eventName, 1);
-  } else {
-    return EventEmitter.prototype.emit.apply(this, arguments);
+  onSeries (eventName, listener) {
+    let self = this;
+
+    EventEmitter.prototype.on.call(this, eventName, function(data) {
+      if (listener.length !== 2) {
+        return listener.apply(this, arguments);
+      }
+
+      self.queue.push({
+        data: data,
+        listener: listener,
+        eventName: eventName,
+        arguments: arguments
+      });
+
+      next.call(self);
+    });
   }
 }
 
-EventBus.prototype.use = function(eventName, listener) {
-  this.useQueue.push(eventName);
-  this.onSeries(eventName, listener);
-}
-
-EventBus.prototype.onSeries = function(eventName, listener) {
-  var self = this;
-
-  EventEmitter.prototype.on.call(this, eventName, function(data) {
-    if (listener.length !== 2) {
-      return listener.apply(this, arguments);
-    }
-
-    self.queue.push({
-      data: data,
-      listener: listener,
-      eventName: eventName,
-      arguments: arguments
-    });
-
-    next.call(self);
-  });
-};
+util.inherits(EventBusObj, EventEmitter);
 
 function next() {
-  var self = this
+  let self = this
     , item = this.queue[0];
 
   if (!item){
@@ -84,7 +82,7 @@ function next() {
       }
 
       if (!self.queue.length && !~self.useQueue.indexOf(item.eventName)) {
-        var argsArr = [].slice.call(item.arguments);
+        let argsArr = [].slice.call(item.arguments);
         self.nest = argsArr[argsArr.length - 1];
       }
       next.call(self);
@@ -92,4 +90,6 @@ function next() {
   }
 }
 
-module.exports = new EventBus();
+
+
+export let EventBus = new EventBusObj();
