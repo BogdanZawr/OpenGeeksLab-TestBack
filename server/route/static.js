@@ -1,12 +1,12 @@
 import send from 'koa-send';
 import path from 'path';
+import koaRouter from 'koa-router';
 
-module.exports = require('koa-router')({
+export let router = koaRouter({
   prefix: '/'
 });
 
-module.exports.get('*', function *(next) {
-  console.log ('r1');
+router.get('*', function *(next) {
   yield send(this, path.join(__dirname, '/../client/index.html'));
   yield next;
 });

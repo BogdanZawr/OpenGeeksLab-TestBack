@@ -22,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.1.4",
+    "eventemitter-co": "^1.0.4",
     "koa": "^1.2.4",
     "koa-body": "^1.6.0",
     "koa-router": "^5.4.0",

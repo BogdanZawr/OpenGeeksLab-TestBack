@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import koaRouter from 'koa-router';
 
 let _parse = (initPath, callback) => {
 
@@ -22,15 +23,18 @@ class bootstrap {
   routes(application) {
     _parse(path.join(__dirname, '..', 'route'), (itemPath) => {
       let router = require(itemPath);
-
-      application
-        .use(router.routes())
-        .use(router.allowedMethods());
-        });
+      for (let i in router) {
+        if (router[i] instanceof koaRouter) {
+          application
+            .use(router[i].routes())
+            .use(router[i].allowedMethods());
+        }
+      }
+    });
   }
 
   events (){
-    _parse(path.join(__dirname, '..', 'handler'), (itemPath, name) => {
+    _parse(path.join(__dirname, '..', 'event'), (itemPath, name) => {
       require(itemPath);
     });
   }

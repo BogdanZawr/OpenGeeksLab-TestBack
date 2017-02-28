@@ -10,7 +10,7 @@ const app = koa();
 validate(app);
 
 app.use(body({
-	multipart: true , 
+	multipart: true ,
 	formidable: {
 		keepExtensions: true
 	}
@@ -28,6 +28,7 @@ app.use(staticFile(path.join(__dirname, '/../client')));
 
 
 bootstrap.routes(app);
+bootstrap.events();
 
 
 app.listen(5000, function() {
