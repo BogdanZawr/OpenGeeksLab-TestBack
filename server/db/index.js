@@ -2,9 +2,12 @@ import mongoose from 'mongoose';
 import config from './../config';
 import async from 'async';
 import * as _ from 'lodash';
-import * as Model from './../component/Model';
+import * as Model from './../component/model';
 
-import {TestWriteSchema} from './write/test'
+import {testWriteSchema} from './write/test'
+import {userWriteSchema} from './write/user'
+import {tokenWriteSchema} from './write/token'
+import {secretKeyWriteSchema} from './write/secretKey'
 
 let dbList = {};
 let db = {},
@@ -65,12 +68,15 @@ _.keys(db).forEach(function(dbType) {
 
 let models = {
   write: {
-    Test:     db.write.model('test',TestWriteSchema),
+    test:     db.write.model('test',testWriteSchema),
+    user:     db.write.model('user',userWriteSchema),
+    token:     db.write.model('token',tokenWriteSchema),
+    secretKey:     db.write.model('secretKey',secretKeyWriteSchema),
   },
-  read: {
-  },
-  static: {
-  }
+  // read: {
+  // },
+  // static: {
+  // }
 };
 
 // add db getters

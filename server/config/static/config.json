@@ -2,14 +2,5 @@
   "app" : {
     "name" : "koa_base"
   },
-  "sessionCookie" : {
-    "path" : "/",
-    "httpOnly" : true,
-    "secure" : false,
-    "maxAge" : null
-  },
-  "sessionSecret" : "KOA_BASE",
-  "sessionPrefix" : "koa_base_",
-  "emailFrom" : "KOA_BASE <support@koa_base.com>",
   "socketsStorageDb" : 5
 }

@@ -1,7 +1,6 @@
-import {EventBus}  from '../component/EventBus';
-import {Test}  from "../action/test";
-let test = new Test();
+import {eventBus}  from '../component/eventBus';
+import {test}  from "../action/test";
 
-EventBus.on('eventTestGen', test.testEventGen);
-EventBus.on('eventTestFun', test.testEventFun);
-EventBus.on('eventTestAsync', test.testEventAsync);
+eventBus.on('eventTestGen', test.testEventGen);
+eventBus.on('eventTestFun', test.testEventFun);
+eventBus.on('eventTestAsync', test.testEventAsync);

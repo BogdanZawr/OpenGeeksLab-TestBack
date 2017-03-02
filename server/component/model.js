@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import * as _ from 'lodash';
 import util  from 'util';
 import q  from 'q';
-import {EventBus}  from './EventBus';
 
 const defaultLimit = 20;        //page size
 const defaultPageNumber = 0;    //page number

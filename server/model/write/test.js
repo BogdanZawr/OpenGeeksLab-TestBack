@@ -1,3 +1,2 @@
 import {dbList} from './../../db';
-let TestWrite = dbList.write('Test');
-export {TestWrite}
+export let testWrite = dbList.write('test');

@@ -1,12 +1,12 @@
-import {TestWrite}  from "../model/write/test";
+import {testWrite}  from "../model/write/test";
 
-import {EventBus}  from '../component/EventBus';
+import {eventBus}  from '../component/eventBus';
 
-export class Test {
+class Test {
   * testEventGen  (data) {
     console.log(data);
     try {
-      let t = yield TestWrite.findRows({
+      let t = yield testWrite.findRows({
         query:{}
       });
 
@@ -26,7 +26,7 @@ export class Test {
   async testEventAsync  (data) {
     console.log(data);
     try {
-      let t = await TestWrite.aggregateWithOptions({
+      let t = await testWrite.aggregateWithOptions({
         query:[],
         options: {
           limit: 2,
@@ -58,28 +58,38 @@ export class Test {
     let t;
 
     try {
-      t = yield TestWrite.aggregateWithOptions({
+      t = yield testWrite.aggregateWithOptions({
         query:[],
         options: {
           limit: 2,
           pageNumber: 0
         }
-      });}
+      });
+
+      // t = yield testWrite.insertRow({
+      //   data:{
+      //     "name": router.request.body.name,
+      //     "updatedAt": new Date("2017-02-28T09:06:21.422Z"),
+      //     "createdAt": new Date("2017-02-28T09:06:21.422Z")
+      //   }
+      // });
+    }
     catch (err) {
       router.body = err;
       router.status = 400;
       return;
     }
 
-    EventBus.emit('eventTestAsync', t);
+    eventBus.emit('eventTestAsync', t);
 
     router.body = t;
   }
 
   testRouterFun  (router) {
     router.body = 'testu';
-    EventBus.emit('eventTestFun');
+    eventBus.emit('eventTestFun');
   }
 
 }
 
+export let test = new Test();

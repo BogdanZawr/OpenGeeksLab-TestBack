@@ -1,7 +1,5 @@
-import {Test}  from "../action/test";
+import {test}  from "../action/test";
 import koaRouter from 'koa-router';
-
-let test = new Test();
 
 export let router = koaRouter({
   prefix: '/r'

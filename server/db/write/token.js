@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 import * as _ from 'lodash';
 import standardField from '../../component/db/dbStandardField';
 
-export let testWriteSchema = new mongoose.Schema(
+export let tokenWriteSchema = new mongoose.Schema(
   _.assignIn(
     _.cloneDeep(standardField),
     {
-      name: { type: String, required: true, trim: true }
+      userId: {type: 'ObjectId', required: true},
+      token: { type: String, required: true }
     }));

@@ -33,4 +33,4 @@ class EventBusObj extends CoEvent {
   }
 }
 
-export let EventBus = new EventBusObj();
+export let eventBus = new EventBusObj();
