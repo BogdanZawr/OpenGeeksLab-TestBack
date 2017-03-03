@@ -8,6 +8,7 @@ import {testWriteSchema} from './write/test'
 import {userWriteSchema} from './write/user'
 import {tokenWriteSchema} from './write/token'
 import {secretKeyWriteSchema} from './write/secretKey'
+import {asymmetricEncryptionWriteSchema} from './write/asymmetricEncryption'
 
 let dbList = {};
 let db = {},
@@ -72,6 +73,7 @@ let models = {
     user:     db.write.model('user',userWriteSchema),
     token:     db.write.model('token',tokenWriteSchema),
     secretKey:     db.write.model('secretKey',secretKeyWriteSchema),
+    asymmetricEncryption:     db.write.model('asymmetricEncryption',asymmetricEncryptionWriteSchema),
   },
   // read: {
   // },

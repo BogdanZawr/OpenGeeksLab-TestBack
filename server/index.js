@@ -7,6 +7,7 @@ import body from 'koa-body';
 import config from './config';
 import secretKey from './component/secretKey';
 import co from 'co';
+import crypto from './component/asymmetricEncryption';
 
 co(function*(){
 
@@ -20,26 +21,53 @@ co(function*(){
   }
 
 
-    let data = {
-      timestamp: (new Date()).getTime(),
-      id: '1111111111',
-      role: [ 'admin' , 'manager']
-    }
+  let key = yield crypto.generateKey();
 
-    let encrypted  = yield secretKey.encrypt(data);
-    console.log(encrypted);
+  console.log(key.private);
+  console.log(key.public);
 
-    setTimeout(()=>{
-        co(function*(){
-          try {
-            let decrypted  = yield secretKey.decrypt(encrypted);
-            console.log(decrypted);}
+  let enc = yield crypto.encrypt({
+    privateKey: key.private,
+    message: '1234567890 test 0987654321'
+  });
+  console.log(enc);
 
-          catch (err) {
-            console.error(err);
-          }
-        })
-      },6000);
+  let encStr = enc.toString('base64');
+
+  enc = Buffer(enc, 'base64');
+
+  console.log(enc);
+
+  let dec = yield crypto.decrypt({
+    privateKey:key.private,
+    message: enc
+  });
+  console.log(dec.toString());
+
+
+
+
+
+  // let data = {
+  //   timestamp: (new Date()).getTime(),
+  //   id: '1111111111',
+  //   role: [ 'admin' , 'manager']
+  // }
+
+  // let encrypted  = yield secretKey.encrypt(data);
+  // console.log(encrypted);
+
+  // setTimeout(()=>{
+  //     co(function*(){
+  //       try {
+  //         let decrypted  = yield secretKey.decrypt(encrypted);
+  //         console.log(decrypted);}
+
+  //       catch (err) {
+  //         console.error(err);
+  //       }
+  //     })
+  //   },6000);
 
 
   const app = koa();
