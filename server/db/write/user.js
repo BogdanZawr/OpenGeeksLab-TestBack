@@ -6,19 +6,24 @@ export let userWriteSchema = new mongoose.Schema(
   _.assignIn(
     _.cloneDeep(standardField),
     {
-      login: { type: String, required: true, trim: true, unique : true },
+      name: { type: String },
       email: { type: String, required: true, trim: true, unique : true },
 
-      isOnline : { type : Boolean, default : false },
-      lastLoginTime : { type: Date, default: Date.now },
+      isOnline: { type : Boolean, default : false },
+      isDeleted: { type : Boolean, default : false },
+      lastLoginTime: { type: Date, default: Date.now },
 
-      salt : String,
-      password : String,
+      salt: String,
+      password: String,
 
-      // identities : {
+      identities: {
       //   twitterId : { type : String, default : '' },
-      //   facebookId : { type : String, default : '' },
+        facebookId: { type : String, default : null },
       //   vkontakteId : { type : String, default : '' },
-      //   googleId : { type : String, default : '' }
-      // }
+        googleId: { type : String, default : null }
+      },
+
+      roles: [{ type: String, enum: ['admin'], default: [] }],
+
+      accessCode: { type : String, default : null }
     }));

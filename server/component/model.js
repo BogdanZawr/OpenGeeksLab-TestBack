@@ -45,6 +45,7 @@ let extendMongoose = (dbType) => {
             deferred.resolve(item);
           });
         });
+        return deferred.promise;
       },
 
       insertRow : ({data, callback = null}) => {

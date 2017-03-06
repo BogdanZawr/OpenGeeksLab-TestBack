@@ -21,28 +21,28 @@ co(function*(){
   }
 
 
-  let key = yield crypto.generateKey();
+  // let key = yield crypto.generateKey();
 
-  console.log(key.private);
-  console.log(key.public);
+  // console.log(key.private);
+  // console.log(key.public);
 
-  let enc = yield crypto.encrypt({
-    privateKey: key.private,
-    message: '1234567890 test 0987654321'
-  });
-  console.log(enc);
+  // let enc = yield crypto.encrypt({
+  //   privateKey: key.private,
+  //   message: '1234567890 test 0987654321'
+  // });
+  // console.log(enc);
 
-  let encStr = enc.toString('base64');
+  // let encStr = enc.toString('base64');
 
-  enc = Buffer(enc, 'base64');
+  // enc = Buffer(enc, 'base64');
 
-  console.log(enc);
+  // console.log(enc);
 
-  let dec = yield crypto.decrypt({
-    privateKey:key.private,
-    message: enc
-  });
-  console.log(dec.toString());
+  // let dec = yield crypto.decrypt({
+  //   privateKey:key.private,
+  //   message: enc
+  // });
+  // console.log(dec.toString());
 
 
 

@@ -6,8 +6,8 @@ module.exports = {
   secretKey: {
     keepCount: 3,
     length: 256,
-    lifetime: 2000,
-  // lifetime: 172800000, //1000 * 60 * 60 * 24 * 2
+    // lifetime: 2000,
+    lifetime: 172800000, //1000 * 60 * 60 * 24 * 2
   },
   asymmetricEncryption: {
     bits: 1024, // max 2048
@@ -17,11 +17,13 @@ module.exports = {
   token:{
     accessExpired: 3600000,//1000 * 60 *  60,
     refreshExpired: 86400000,//1000 * 60 * 60 * 24
+    refreshLength: 256,
+    refreshRegenWithAccess: false,
   },
-  // authCode:{
-  //   time: 900000//1000 * 60 * 15,
-  // },
-  // confirmCodeLength:5,
+  accessCode: {
+    lifetime: 900000, //1000 * 60 * 15,
+    length: 5,
+  },
   // mongoConnectionStrings : {
   //   write: process.env.MONGODB_WRITE
   // }

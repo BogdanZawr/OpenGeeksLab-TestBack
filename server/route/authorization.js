@@ -14,3 +14,4 @@ router.post('/setPassword', function *(next)  {
   yield authorization.setPassword(this);
   yield next;
 });
+
