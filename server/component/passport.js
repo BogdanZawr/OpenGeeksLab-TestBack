@@ -45,15 +45,15 @@ passport.use(new BearerStrategy(
       try {
         let tokenEnc = yield secretKey.decrypt(token);
 
-        if (!tokenEnc || !tokenEnc._id || !tokenEnc.roles || !tokenEnc.createTime) {
+        if (!tokenEnc || !tokenEnc._id || !tokenEnc.roles || !tokenEnc.expireTime) {
           throw('Access token is incorrect')
         }
 
-        if (new Date(tokenEnc.createTime) < new Date()) {
+        if (new Date(tokenEnc.expireTime) < new Date()) {
           throw('Access token is expired')
         }
 
-        done(null, tokenEnc);
+        done(null, _.omit(tokenEnc,['expireTime']));
       }
       catch (err) {
         done({message: err, param : 'accessToken'}, false, {message: err, param : 'accessToken'});

@@ -23,7 +23,7 @@ class Token {
   * genAccess(user) {
     let tokenData = _.pick (user, ['_id','roles']);
 
-    tokenData.createTime = new Date().getTime() + config.token.accessExpired;
+    tokenData.expireTime = new Date().getTime() + config.token.accessExpired;
 
     try {
       return yield secretKey.encrypt(tokenData);
