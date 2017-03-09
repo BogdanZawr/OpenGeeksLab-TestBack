@@ -12,4 +12,14 @@ module.exports  =  {
     port: 6379,
     prefix : 'koa_base'
   },
+  facebook: {
+    clientID: process.env.FACEBOOK_FREELAN_APP_ID,
+    clientSecret: process.env.FACEBOOK_FREELAN_APP_SECRET,
+    callbackURL: hostUrl + 'auth/facebook/callback'
+  },
+  google: {
+    clientID: process.env.GOOGLE_FREELAN_APP_ID,
+    clientSecret: process.env.GOOGLE_FREELAN_APP_SECRET,
+    callbackURL: hostUrl + 'auth/google/callback'
+  },
 };

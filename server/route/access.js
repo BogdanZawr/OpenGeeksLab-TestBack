@@ -33,3 +33,8 @@ router2.get('/loginConfirm', function *(next)  {
   yield access.loginConfirm(this);
   yield next;
 });
+
+router2.post('/changePassword', function *(next)  {
+  yield access.changePassword(this);
+  yield next;
+});

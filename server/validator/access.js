@@ -27,7 +27,7 @@ class ValidateAccess {
         throw({param : 'email', msg : 'There is an existing user connected to this email'});
       }
 
-      return (_.pick(router.request.body,['email','password']));
+      return _.pick(router.request.body,['email','password']);
     }
     catch (err) {
       throw(err);
@@ -37,7 +37,7 @@ class ValidateAccess {
   * login (router) {
     router.checkBody('email').isEmail('Valid email is required');
 
-    router.checkBody('password').empty('Valid password is required');
+    router.checkBody('password').notEmpty('Valid password is required');
 
     if (router.errors) {
       throw(router.errors);
@@ -67,7 +67,7 @@ class ValidateAccess {
   }
 
   * refreshToken (router) {
-    router.checkBody('refreshToken').empty('Valid refresh token is required');
+    router.checkBody('refreshToken').notEmpty('Valid refresh token is required');
 
     if (router.errors) {
       throw(router.errors);
@@ -93,6 +93,40 @@ class ValidateAccess {
       throw(err);
     }
   }
+
+
+  * changePassword (router) {
+    router.checkBody('oldPassword').notEmpty('Valid password is required');
+    router.checkBody('password').len(5, 20 ,'Password must be between 5-20 characters long');
+    router.checkBody('confirm').eq(router.request.body.password,'Confirm password mast be equals New password');
+
+    if (router.errors) {
+      throw(router.errors);
+    }
+
+    try {
+      let user = yield userWrite.findRow({
+        query: {
+          _id : router.request.user._id,
+          isDeleted: false
+        }
+      });
+
+      if (!user) {
+        throw({msg : 'User not found'});
+      }
+
+      if (userWrite.saltPassword(user.salt,router.request.body.oldPassword) !== user.password) {
+        throw({param : 'oldPassword', msg : 'User old password is not correct'});
+      }
+
+      return _.pick(router.request.body,['password']);
+    }
+    catch (err) {
+      throw(err);
+    }
+  }
+
 }
 
 export let validateAccess = new ValidateAccess();

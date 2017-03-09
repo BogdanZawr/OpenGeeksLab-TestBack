@@ -34,7 +34,7 @@ class Access {
   }
 
   * loginConfirm (router) {
-      let user = yield userWrite.getUserById(router.request.user._id);//--------------------------------//
+      let user = yield userWrite.getUserById(router.request.user._id);
       router.body =  _.pick(user, userFreeData);
   }
 
@@ -44,6 +44,20 @@ class Access {
       let user = yield userWrite.getUserById(regData.userId);
 
       router.body =  _.pick(_.assignIn(user, yield token.genNewAccess(user)), userFreeData);
+    }
+    catch (err) {
+      router.body = err;
+      router.status = 400;
+      return;
+    }
+  }
+
+  * changePassword (router) {
+    try {
+      let regData = yield validateAccess.changePassword(router);
+      let user = yield userWrite.changePassword(router.request.user._id, regData.password);
+
+      router.body =  _.pick(user, userFreeData);
     }
     catch (err) {
       router.body = err;

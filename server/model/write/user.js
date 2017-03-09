@@ -56,7 +56,6 @@ userWrite.newUser = function * (data) {
   }
 };
 
-
 userWrite.getUserById = function * (id) {
   try {
     let user = yield this.findRow({
@@ -69,4 +68,17 @@ userWrite.getUserById = function * (id) {
   catch (err) {
     throw(err);
   }
+};
+
+
+userWrite.changePassword = function * (id,password) {
+  let data = this.hashPassword(password);
+  data.updatedAt = new Date();
+
+  return yield this.updateRow({
+      query: {
+        _id: id
+      },
+      data: data
+    });
 };

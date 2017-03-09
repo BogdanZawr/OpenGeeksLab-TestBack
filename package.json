@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon server/index.js",
-    "package": "babel server/ -d server-build/",
+    "build": "babel server/ -d server-build/",
     "runDev": "babel-node server/index.js",
     "debugDev": "babel-node debug server/index.js",
     "monitor": "nodemon --exec babel-node server/index.js"
@@ -38,6 +38,8 @@
     "mongoose": "4.1.5",
     "nconf": "^0.8.4",
     "node-rsa": "^0.4.2",
+    "passport-facebook": "^2.1.1",
+    "passport-google-auth": "^1.0.1",
     "passport-http-bearer": "^1.0.1",
     "path": "^0.12.7",
     "q": "^1.4.1",

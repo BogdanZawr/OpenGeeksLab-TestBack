@@ -2,14 +2,12 @@ import secretKey from './secretKey';
 import {tokenWrite}  from "../model/write/token";
 import config from '../config';
 import * as _ from 'lodash';
-import {eventBus}  from './eventBus';
 
 class Token {
   * genRefresh (user) {
     let that = this;
 
     try {
-      eventBus.emit('remove-old-refresh-token');
       return {
         refreshToken: (yield tokenWrite.genNew(user)).token,
         accessToken: yield that.genAccess(user)
@@ -41,7 +39,6 @@ class Token {
       }
       else {
         return {
-          // refreshToken: yield tokenWrite.getUserToken(user._id),
           accessToken: yield this.genAccess (user)
         }
       }
@@ -65,10 +62,15 @@ class Token {
       console.log(err);
     }
   }
+
+  * scheduleStart () {
+    let that = this;
+    setTimeout(()=>{
+        co(function*(){
+          yield that.removeOld();
+        })
+      },config.token.refreshExpired);
+  }
 }
 
-let token = new Token();
-
-eventBus.on('remove-old-refresh-token',token.removeOld);
-
-export default token;
+export default new Token();
