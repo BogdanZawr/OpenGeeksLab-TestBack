@@ -45,7 +45,7 @@ co(function*(){
   //   },6000);
 
 
-  const app = koa();
+  const app = new  koa();
 
   validate(app);
 

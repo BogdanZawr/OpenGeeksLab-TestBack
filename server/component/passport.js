@@ -3,7 +3,6 @@ import passport from 'passport';
 import {dbList} from '../db';
 import {Strategy as BearerStrategy} from 'passport-http-bearer';
 import {Strategy as FacebookStrategy} from 'passport-facebook';
-import {Strategy as GoogleStrategy} from 'passport-google-auth';
 import * as _ from 'lodash';
 import config from '../config';
 import secretKey from './secretKey';
