@@ -1,12 +1,12 @@
-import {dbList} from './../../db';
+import db from '../../component/db';
 import keygen from 'keygen';
 import config from '../../config';
 
-export let tokenWrite = dbList.write('token');
+let tokenWrite = db.model('write', 'token');
 
-tokenWrite.genNew = function * (user) {
-  try {
-    return yield tokenWrite.insertRow({
+class TokenWrite {
+  genNew(user) {
+    return tokenWrite.insertRow({
       data: {
         token: keygen.url(config.token.refreshLength),
         userId: user._id,
@@ -14,20 +14,35 @@ tokenWrite.genNew = function * (user) {
       }
     });
   }
-  catch (err) {
-    throw (err);
-  }
-};
 
-tokenWrite.getUserToken = function * (id) {
-  try {
-    return (yield tokenWrite.findRow({
+  async getUserToken(userId) {
+    return (await tokenWrite.findRow({
       query: {
-        userId: id
+        userId,
       }
     })).token;
   }
-  catch (err) {
-    throw (err);
+
+  getNonExpiredToken(token) {
+    return tokenWrite.findRow({
+      query: {
+        token,
+        expire: {
+          $gt: new Date()
+        }
+      }
+    });
   }
-};
+
+  deleteExpired() {
+    return tokenWrite.deleteRows({
+      query: {
+        expire: {
+          $lt: new Date()
+        }
+      }
+    });
+  }
+}
+
+export default new TokenWrite();

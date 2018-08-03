@@ -1,71 +1,87 @@
-import {userWrite}  from "../model/write/user";
-import {validateAccess}  from "../validator/access";
-import config from '../config';
+import _ from 'lodash';
+import keygen from 'keygen';
+import q from 'q';
+
+import userWrite from '../model/write/user';
 import token from '../component/token';
-import * as _ from 'lodash';
+import mailer from '../component/mailer';
+import config from '../config';
 
-let userFreeData = ["accessToken", "refreshToken", "createdAt", "updatedAt", "isDeleted", "lastLoginTime", "roles", "_id", "email"];
 
-class Access {
+const userFreeData = [
+  'accessToken',
+  'refreshToken',
+  'createdAt',
+  'updatedAt',
+  'isDeleted',
+  'roles',
+  '_id',
+  'email',
+  'firstName',
+  'lastName',
+];
 
-  * register (router) {
-    try {
-      let regData = yield validateAccess.register(router);
-      router.body = _.pick(yield userWrite.newUser(regData), userFreeData);
-    }
-    catch (err) {
-      router.body = err;
-      router.status = 400;
-      return;
-    }
+class AccessAction {
+  async register(data) {
+    const user = await userWrite.newUser(data);
+
+    return _.pick(user, userFreeData);
   }
 
-  * login (router) {
-    try {
-      let regData = yield validateAccess.login(router);
-      _.assignIn(regData,yield token.genRefresh(regData));
-      router.body = _.pick(regData, userFreeData);
-    }
-    catch (err) {
-      router.body = err;
-      router.status = 400;
-      return;
-    }
+  async login(user) {
+    const userData = _.assignIn(user, await token.genRefresh(user));
+
+    return _.pick(userData, userFreeData);
   }
 
-  * loginConfirm (router) {
-      let user = yield userWrite.getUserById(router.request.user._id);
-      router.body =  _.pick(user, userFreeData);
+  async loginConfirm(user) {
+    const userData = await userWrite.findById(user._id);
+
+    return _.pick(userData, userFreeData);
   }
 
-  * refreshToken (router) {
-    try {
-      let regData = yield validateAccess.refreshToken(router);
-      let user = yield userWrite.getUserById(regData.userId);
-
-      router.body =  _.pick(_.assignIn(user, yield token.genNewAccess(user)), userFreeData);
-    }
-    catch (err) {
-      router.body = err;
-      router.status = 400;
-      return;
-    }
+  async refreshToken(userToken) {
+    const user = await userWrite.findById(userToken.userId);
+    return _.pick(_.assignIn(user, await token.genNewAccess(user)), userFreeData);
   }
 
-  * changePassword (router) {
-    try {
-      let regData = yield validateAccess.changePassword(router);
-      let user = yield userWrite.changePassword(router.request.user._id, regData.password);
+  async changePassword(password, user) {
+    await userWrite.changePassword(user._id, password);
 
-      router.body =  _.pick(user, userFreeData);
-    }
-    catch (err) {
-      router.body = err;
-      router.status = 400;
-      return;
-    }
+    return {
+      result: 'success',
+    };
   }
 
+  async forgot(user) {
+    const pass = keygen.url(config.passwordLength);
+
+    const userData = await userWrite.changePassword(user._id, pass);
+
+    const deferred = q.defer();
+
+    mailer.messages().send({
+      from: config.mailgun.mailFrom,
+      to: userData.email,
+      subject: 'Pasword reset',
+      html: `<h4>This letter was sent to your e-mail to verify the identity when changing the password.</h4>
+        <p>New password: ${pass}</p>`,
+    }, (err, body) => {
+      if (err) {
+        console.log(err);
+        deferred.reject(err);
+        return;
+      }
+      deferred.resolve(body);
+    });
+
+    await deferred.promise;
+
+
+    return {
+      result: 'success',
+    };
+  }
 }
 
-export default  new Access();
+export default new AccessAction();

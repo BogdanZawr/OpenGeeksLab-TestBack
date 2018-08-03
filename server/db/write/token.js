@@ -1,8 +1,9 @@
-import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import * as _ from 'lodash';
+
 import standardField from '../../component/db/dbStandardField';
 
-export let tokenWriteSchema = new mongoose.Schema(
+export default new Schema(
   _.assignIn(
     _.cloneDeep(standardField),
     {

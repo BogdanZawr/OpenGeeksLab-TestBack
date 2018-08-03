@@ -1,93 +1,105 @@
-import mongoose from 'mongoose';
-import passport from 'passport';
-import {dbList} from '../db';
-import {Strategy as BearerStrategy} from 'passport-http-bearer';
-import {Strategy as FacebookStrategy} from 'passport-facebook';
-import * as _ from 'lodash';
-import config from '../config';
-import secretKey from './secretKey';
-import co from 'co';
+import passport from 'koa-passport';
 import q  from 'q';
+import * as _ from 'lodash';
+
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
+
+import secretKey from './secretKey';
+import userWrite  from '../model/write/user';
+import middlewareWrapper from './middlewareWrapper';
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  return done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
+  return done(null, user);
 });
 
-export let bearerMiddleware = function *(next)  {
+export let bearerMiddleware = async (req, next) => {
   let deferred = q.defer();
-  passport.authenticate('bearer', (err, user, info) => {
+
+  passport.authenticate('bearer', (err, user) => {
     if (err) {
-      this.body = err;
-      this.status = 400;
-      deferred.reject(err);
-      return;
+      return deferred.reject(err);
     }
 
     if (!user) {
-      this.body = {message:"User not found", param : 'accessToken'};
-      this.status = 400;
-      deferred.reject(this.body);
-      return;
+      return deferred.reject([{ message:'User not found', param : 'accessToken' }]);
     }
 
-    this.request.user = user;
     deferred.resolve(user);
-  })(this, null);
+  })(req, null);
+
 
   try {
-    yield deferred.promise;
-    yield next;
+    req.request.user = await deferred.promise;
+    await next();
   }
-  catch (err) {}
+  catch (err) {
+    req.body = err;
+    req.status = 400;
+    middlewareWrapper.headerSet(req);
+  }
+
 }
 
 passport.use(new BearerStrategy(
-  function (token, done) {
-    co(function * () {
-      try {
-        let tokenEnc = yield secretKey.decrypt(token);
+  async (token, done) => {
+    let tokenEnc;
+    try {
+      tokenEnc = await secretKey.decrypt(token);
+    }
+    catch (err) {
+      return done ([{ message: err, param : 'accessToken' }]);
+    }
 
-        if (!tokenEnc || !tokenEnc._id || !tokenEnc.roles || !tokenEnc.expireTime) {
-          throw('Access token is incorrect')
-        }
+    if (!tokenEnc || !tokenEnc._id || !tokenEnc.roles || !tokenEnc.expireTime) {
+      return done ([{ message: 'Access token is incorrect', param : 'accessToken' }]);
+    }
 
-        if (new Date(tokenEnc.expireTime) < new Date()) {
-          throw('Access token is expired')
-        }
+    if (new Date(tokenEnc.expireTime) < new Date()) {
+      return done ([{ message: 'Access token is expired', param : 'accessToken' }]);
+    }
 
-        done(null, _.omit(tokenEnc,['expireTime']));
-      }
-      catch (err) {
-        done({message: err, param : 'accessToken'}, false, {message: err, param : 'accessToken'});
-      }
-    });
+    done(null,  _.omit(tokenEnc,['expireTime']));
   }
 ));
 
-// passport.use(new FacebookStrategy({
-//     clientID: 'your-client-id',
-//     clientSecret: 'your-secret',
-//     callbackURL: 'http://localhost:' + config.http.port + '/auth/facebook/callback'
-//   },
-//   function(token, tokenSecret, profile, done) {
-//     // retrieve user ...
-//     fetchUser().then(user => done(null, user))
-//   }
-// ));
 
-// passport.use(new GoogleStrategy({
-//     clientId: 'your-client-id',
-//     clientSecret: 'your-secret',
-//     callbackURL: 'http://localhost:' + config.http.port + '/auth/google/callback'
-//   },
-//   function(token, tokenSecret, profile, done) {
-//     // retrieve user ...
-//     fetchUser().then(user => done(null, user))
-//   }
-// ));
 
-export default passport;
+function tryToFind(query, done, callback, updateCallback) {
+  userWrite.findRow({
+    query: query,
+    callback: function(err,user) {
+      if (err) {
+        return done(err);
+      }
+
+      if (user) {
+        if (!updateCallback) {
+          return done(null, user);
+        }
+
+        updateCallback(user);
+        return userWrite.update({
+          query: {
+            _id : user._id
+          },
+          data: _.pick(user, 'identities'),
+          callback: function(err, item, affected) {
+            if (err) {
+              return done(err);
+            }
+            done(null, user);
+          }
+        });
+      }
+
+      callback && callback();
+    }
+  });
+};
+
+
+export {passport};

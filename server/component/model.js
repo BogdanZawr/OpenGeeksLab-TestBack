@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import * as _ from 'lodash';
-import util  from 'util';
 import q  from 'q';
 
 const defaultLimit = 20;        //page size
@@ -26,7 +25,7 @@ let extendMongoose = (dbType) => {
           }
 
           if (!doc) {
-            let message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
+            let message = `ntity from model ${Model.modelName} was not found by query ${JSON.stringify(query)}`;
             let error = new Error(message);
             callback && callback(error);
             return deferred.reject(error);
@@ -69,7 +68,7 @@ let extendMongoose = (dbType) => {
         return deferred.promise;
       },
 
-      deleteRow : ({query = {}, callback = null}) => {
+      deleteRow : ({query = {}, callback = null} = { query:{}, callback:null }) => {
         let deferred = q.defer();
 
         let Model = self;
@@ -81,7 +80,7 @@ let extendMongoose = (dbType) => {
           }
 
           if (!doc) {
-            let message = util.format('Entity from model [%s] was not found by query [%s]', Model.modelName, JSON.stringify(query));
+            let message = `Entity from model ${Model.modelName} was not found by query ${JSON.stringify(query)}`;
             let error = new Error(message);
             callback && callback(error);
             return deferred.reject(error);
@@ -108,15 +107,15 @@ let extendMongoose = (dbType) => {
         return self.update(query, data, options, callback);
       },
 
-      deleteRows : ({query = {}, callback = null}) => {
+      deleteRows : ({query = {}, callback = null} = { query:{}, callback: null }) => {
         return self.remove(query, callback);
       },
 
-      countRows : ({query = {}, callback = null}) => {
+      countRows : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         return self.count(query, callback);
       },
 
-      rowExists : ({query = {}, callback = null}) => {
+      rowExists : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         let deferred = q.defer();
         self.count(query, (err, count) => {
           if (err) {
@@ -130,7 +129,7 @@ let extendMongoose = (dbType) => {
         return deferred.promise;
       },
 
-      aggregateRows : ({query = [], callback = null}) => {
+      aggregateRows : ({query = [], callback = null} = { query: [], callback: null }) => {
         return self.aggregate(query).allowDiskUse(true).exec(callback);
       },
 
@@ -138,31 +137,45 @@ let extendMongoose = (dbType) => {
         return self.populate(items, options, callback);
       },
 
-      findRows : ({query = {}, callback = null}) => {
+      findRows : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         return self.find(query).lean().exec(callback);
       },
 
-      findRow : ({query = {}, callback = null}) => {
+      findRow : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         return self.findOne(query).lean().exec(callback);
       },
 
-      findDocs : ({query = {}, callback = null}) => {
+      findById : ({id, callback = null}) => {
+        let deferred = q.defer();
+        self.find({
+          _id: mongoose.Types.ObjectId(id)
+        }).lean().exec((err, user) => {
+          if (err) {
+            callback && callback(err);
+            return deferred.reject(err);
+          }
+          callback && callback(null, user[0]?user[0]: null);
+          deferred.resolve(user[0]?user[0]: null);
+        });
+
+        return deferred.promise;
+      },
+
+      findDocs : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         return self.find(query).exec(callback);
       },
 
-      findDoc : ({query = {}, callback = null}) => {
+      findDoc : ({query = {}, callback = null} = { query: {}, callback: null }) => {
         return self.findOne(query).exec(callback);
       },
 
-      findWithOptions : ({query = {}, options = {}, callback = null}) => {
+      findWithOptions : ({query = {}, options = {}, callback = null} = { query: {}, options: {}, callback: null }) => {
         let deferred = q.defer();
 
         let Query = self.find(query);
 
-        _.defaults(options, {
-          limit: defaultLimit,
-          pageNumber: defaultPageNumber
-        });
+        options.limit = (!Number(options.limit))? defaultLimit : Number(options.limit);
+        options.pageNumber = (!Number(options.pageNumber))? defaultPageNumber : Number(options.pageNumber);
 
         if (options.select) {
           Query = Query.select(options.select);
@@ -205,13 +218,11 @@ let extendMongoose = (dbType) => {
         return deferred.promise;
       },
 
-      aggregateWithOptions : ({query = [], options = {}, callback = null}) => {
+      aggregateWithOptions : ({query = [], options = {}, callback = null} = { query: [], options: {}, callback: null }) => {
         let deferred = q.defer();
 
-        _.defaults(options, {
-          limit: defaultLimit,
-          pageNumber: defaultPageNumber
-        });
+        options.limit = (!Number(options.limit))? defaultLimit : Number(options.limit);
+        options.pageNumber = (!Number(options.pageNumber))? defaultPageNumber : Number(options.pageNumber);
 
         if (options.sort) {
           let sort = typeof options.sort === 'string' ? JSON.parse(options.sort) : options.sort;
@@ -220,6 +231,8 @@ let extendMongoose = (dbType) => {
           });
           !_.isEmpty(sort) && query.push({ $sort : sort });
         }
+
+        let countQuery = _.cloneDeep(query);
 
         if (options.pageNumber >= defaultPageNumber) {
           query.push({ $skip :  options.pageNumber * options.limit });
@@ -235,26 +248,8 @@ let extendMongoose = (dbType) => {
             return deferred.reject(err);
           }
 
-          if (results.length) {
+          if (!results) {
 
-            let countquery  = [].concat(query, {$group :{_id:"1", count: { $sum: 1 }}});   //count request
-            self.aggregate(countquery).allowDiskUse(true).exec((err,count) => {
-              if (err) {
-                callback && callback(err);
-                return deferred.reject(err);
-              }
-
-              let res = {
-                pagesCount: Math.ceil(count[0].count / options.limit),
-                results: results,
-                totalCount: count[0].count
-              }
-              callback && callback(null, res);
-              deferred.resolve( res);
-
-            });
-          }
-          else {
             let res = {
               pagesCount: defaultPageCount,
               results: [],
@@ -262,6 +257,36 @@ let extendMongoose = (dbType) => {
             };
             callback && callback(null, res);
             deferred.resolve(res);
+          }
+          else {
+
+            let countquery  = [].concat(countQuery, {$group :{_id:"1", count: { $sum: 1 }}});   //count request
+            self.aggregate(countquery).allowDiskUse(true).exec((err,count) => {
+              if (err) {
+                callback && callback(err);
+                return deferred.reject(err);
+              }
+
+              let res;
+
+              if (count && count.length) {
+                res = {
+                  pagesCount: Math.ceil(count[0].count / options.limit),
+                  results: results,
+                  totalCount: count[0].count
+                }
+              }
+              else {
+                res = {
+                  pagesCount: 0,
+                  results: results,
+                  totalCount: 0
+                }
+              }
+              callback && callback(null, res);
+              deferred.resolve( res);
+
+            });
           }
         });
 
@@ -272,4 +297,4 @@ let extendMongoose = (dbType) => {
 };
 
 
-export {extendMongoose}
+export default extendMongoose;

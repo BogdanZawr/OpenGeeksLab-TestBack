@@ -1,80 +1,52 @@
-import koa from "koa";
-import {boot as bootstrap} from "./component/bootstrap";
-import staticFile from 'koa-static';
+import Koa from 'koa';
+import fs from 'fs';
+import send from 'koa-send';
 import path from 'path';
-import validate from 'koa-validate';
 import body from 'koa-body';
+import passport from 'koa-passport';
+import os from 'os';
+
+import bootstrap from './component/bootstrap';
 import config from './config';
 import secretKey from './component/secretKey';
-import co from 'co';
-import crypto from './component/asymmetricEncryption';
 import token from './component/token';
+import start from './start';
 
-co(function*(){
+try {
+  secretKey.init();
+  secretKey.scheduleStart();
+  token.scheduleStart();
+  start();
+} catch (err) {
+  console.error(err);
+}
 
-  try {
-    yield secretKey.init();
-    yield secretKey.scheduleStart();
-    yield token.scheduleStart();
-  }
-  catch (err) {
-    console.error(err);
+const app = new Koa();
+
+app.use(passport.initialize());
+
+app.use(
+  body({
+    multipart: true,
+    formidable: {
+      uploadDir: os.tmpdir(),
+    },
+  }));
+
+bootstrap.routes(app);
+
+app.use(async (req, next) => {
+  if (req.req
+    && req.req._parsedUrl
+    && req.req._parsedUrl.pathname
+    && fs.existsSync(path.join(__dirname, '/../apidoc', req.req._parsedUrl.pathname))) {
+    await send(req, path.join('/../apidoc', req.req._parsedUrl.pathname));
     return;
   }
 
+  next();
+});
 
-  // let data = {
-  //   timestamp: (new Date()).getTime(),
-  //   id: '1111111111',
-  //   role: [ 'admin' , 'manager']
-  // }
-
-  // let encrypted  = yield secretKey.encrypt(data);
-  // console.log(encrypted);
-
-  // setTimeout(()=>{
-  //     co(function*(){
-  //       try {
-  //         let decrypted  = yield secretKey.decrypt(encrypted);
-  //         console.log(decrypted);}
-
-  //       catch (err) {
-  //         console.error(err);
-  //       }
-  //     })
-  //   },6000);
-
-
-  const app = new  koa();
-
-  validate(app);
-
-  app.use(body({
-  	multipart: true ,
-  	formidable: {
-  		keepExtensions: true
-  	}
-  }));
-
-
-  app.use(staticFile(path.join(__dirname, '/../client')));
-
-  // app.use(function *(next){
-  //   console.log('m1');
-  //   yield next;
-  //   console.log('m5');
-  // });
-
-
-
-  bootstrap.routes(app);
-  bootstrap.events();
-
-
-  bootstrap.sockets();
-
-
-  app.listen(config.http.port, function() {
-    console.log([new Date(), 'Server started on', config.http.port].join(' '));
-  });
+app.listen(config.http.port, () => {
+  console.log([new Date(), 'Server started on', config.http.port].join(' '));
 });

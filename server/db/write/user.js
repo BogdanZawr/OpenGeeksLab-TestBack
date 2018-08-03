@@ -1,29 +1,19 @@
-import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import * as _ from 'lodash';
+
 import standardField from '../../component/db/dbStandardField';
 
-export let userWriteSchema = new mongoose.Schema(
+export default new Schema(
   _.assignIn(
     _.cloneDeep(standardField),
     {
-      name: { type: String },
       email: { type: String, required: true, trim: true, unique : true },
 
-      isOnline: { type : Boolean, default : false },
-      isDeleted: { type : Boolean, default : false },
-      lastLoginTime: { type: Date, default: Date.now },
+      lastName: { type: String, required: true },
+      firstName: { type: String, required: true },
 
       salt: String,
       password: String,
 
-      identities: {
-      //   twitterId : { type : String, default : '' },
-        facebookId: { type : String, default : null },
-      //   vkontakteId : { type : String, default : '' },
-        googleId: { type : String, default : null }
-      },
-
-      roles: [{ type: String, enum: ['admin'], default: [] }],
-
-      accessCode: { type : String, default : null }
+      roles: [{ type: String, enum: ['admin', 'user', 'professional'], default: ['user'] }],
     }));

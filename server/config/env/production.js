@@ -1,12 +1,12 @@
-const hostUrl = process.env.HOST_URL || 'http://localhost:3000/';
+const hostUrl = process.env.HOST_URL || '';
 
 module.exports  =  {
   hostUrl: hostUrl,
   mongoConnectionStrings : {
-    write: 'mongodb://localhost:27017/base-write',
+    write: '',
   },
   clientMainFile: '/apidoc/index.html',
-  staticMaxAge: 0,
+  staticMaxAge: 31104000000, //1000*60*60*24*30*12
   mailgun: {
     mailFrom: 'base@gmail.com',
     api_key: 'key-11111111111111111111111111111111',

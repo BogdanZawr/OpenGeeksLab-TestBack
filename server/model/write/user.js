@@ -1,84 +1,75 @@
-import {dbList} from './../../db';
 import crypto from 'crypto';
 import * as _ from 'lodash';
-import mongoose from 'mongoose';
+
+import db from '../../component/db';
 import token from '../../component/token';
-export let userWrite = dbList.write('user');
 
-userWrite.hashPassword = function (password) {
-  var salt = crypto.randomBytes(16).toString('base64');
-  return {
-    salt : salt,
-    password : this.saltPassword(salt,password)
-  };
-};
+let userWrite = db.model('write', 'user');
 
-userWrite.saltPassword = function (salt,password) {
-  return  crypto.pbkdf2Sync(password, salt, 10000, 64,'sha1').toString('base64');
-}
-
-userWrite.setСode = function * ({data, callback}) {
-  data.code = Math.floor(Math.random()*100000);
-
-  while (data.code.toString().length < config.accessCode.length){
-    data.code = '0' + data.code.toString();
+class UserWrite {
+  hashPassword(password) {
+    const salt = crypto.randomBytes(16).toString('base64');
+    return {
+      salt : salt,
+      password : this.saltPassword(salt,password)
+    };
   }
 
-  data.updatedAt = new Date();
-  data.lastLoginTime = new Date();
+  saltPassword(salt,password) {
+    return crypto.pbkdf2Sync(password, salt, 10000, 64,'sha1').toString('base64');
+  }
 
-  return yield this.updateRow({
-      query: {_id: mongoose.Types.ObjectId(data._id)},
+  update({query, data, callback}) {
+    data.updatedAt = new Date();
+    return userWrite.updateRow({
+      query: query,
       data: data,
       callback: callback
     });
-}
+  }
 
-
-userWrite.update = function * ({request, data, callback}) {
-  data.updatedAt = new Date();
-  return yield this.updateRow({
-      query: request,
-      data: data,
-      callback: callback
-    });
-};
-
-userWrite.newUser = function * (data) {
-  try {
-    let user = yield this.insertRow({
+  async newUser(data) {
+    data.roles = data.roles || [ 'user' ];
+    let user = await userWrite.insertRow({
       data: _.assignIn(data, this.hashPassword(data.password))
     });
-    return _.assignIn(user, yield token.genRefresh(user));
+    return _.assignIn(user, await token.genRefresh(user));
   }
-  catch (err) {
-    throw(err);
-  }
-};
 
-userWrite.getUserById = function * (id) {
-  try {
-    let user = yield this.findRow({
+  changePassword(_id, password) {
+    let data = this.hashPassword(password);
+    data.updatedAt = new Date();
+
+    return userWrite.updateRow({
       query: {
-        _id: id
+        _id,
+        isDeleted: false,
+      },
+      data,
+    });
+  }
+
+  findByEmail(email) {
+    return userWrite.findRow({
+      query:{
+        email,
+        isDeleted: false,
       }
     });
-    return user;
   }
-  catch (err) {
-    throw(err);
+
+  findRow(reqest) {
+    return userWrite.findRow(reqest);
   }
-};
 
-
-userWrite.changePassword = function * (id,password) {
-  let data = this.hashPassword(password);
-  data.updatedAt = new Date();
-
-  return yield this.updateRow({
+  findById(_id) {
+    return userWrite.findRow({
       query: {
-        _id: id
+        _id,
+        isDeleted: false,
       },
-      data: data
     });
-};
+  }
+}
+
+export default new UserWrite();

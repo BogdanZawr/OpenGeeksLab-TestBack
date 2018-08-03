@@ -1,132 +1,180 @@
-import {userWrite}  from "../model/write/user";
-import {tokenWrite}  from "../model/write/token";
 import * as _ from 'lodash';
-import q  from 'q';
 
-class ValidateAccess {
+import userWrite  from '../model/write/user';
+import tokenWrite  from '../model/write/token';
 
-  * register (router) {
-    router.checkBody('email').isEmail('Valid email is required');
+import validator  from '../component/validator';
 
-    router.checkBody('password').len(5, 20 ,'Password must be between 5-20 characters long');
-    router.checkBody('confirm').eq(router.request.body.password,'Confirm password mast be equals New password');
+let userFreeData = [
+    'createdAt',
+    'updatedAt',
+    'isDeleted',
+    'roles',
+    '_id',
+    'email',
+    'firstName',
+    'lastName',
+];
 
-    if (router.errors) {
-      throw(router.errors);
-    }
-
-    try {
-      let user = yield userWrite.findRow({
-        query: {
-          email : router.request.body.email,
-          isDeleted: false
+class AccessValidate {
+  async forgot (body) {
+    let errorList = validator.check(body, {
+      email: {
+        isEmail:  {
+          message: 'Valid email is required'
         }
-      });
-
-      if (user && user.email ==  router.request.body.email) {
-        throw({param : 'email', msg : 'There is an existing user connected to this email'});
       }
+    });
 
-      return _.pick(router.request.body,['email','password']);
+    if (errorList.length) {
+      throw (errorList);
     }
-    catch (err) {
-      throw(err);
+
+    let user = await userWrite.findByEmail(body.email);
+
+    if (!user) {
+      throw([{param : 'email', message : 'User not found'}]);
     }
+
+    return _.pick(user,userFreeData);
   }
 
-  * login (router) {
-    router.checkBody('email').isEmail('Valid email is required');
+  async register (body) {
 
-    router.checkBody('password').notEmpty('Valid password is required');
-
-    if (router.errors) {
-      throw(router.errors);
-    }
-
-    try {
-      let user = yield userWrite.findRow({
-        query: {
-          email : router.request.body.email,
-          isDeleted: false
+    let errorList = validator.check(body, {
+      email: {
+        isEmail:  {
+          message: 'Valid email is required'
         }
-      });
+      },
+      password : {
+        isLength: {
+          options:{
+            min: 5,
+            max: 20,
+          },
+          message: 'Password must be between 5-20 characters long'
+        },
+      },
+      firstName: {
+        notEmpty: {
+          message: 'First Name is required'
+        }
+      },
+      lastName: {
+        notEmpty: {
+          message: 'Last Name is required'
+        }
+      },
+    });
 
-      if (!user) {
-        throw({param : 'email', msg : 'User not found'});
-      }
 
-      if (userWrite.saltPassword(user.salt,router.request.body.password) !== user.password) {
-        throw({param : 'password', msg : 'User password is not correct'});
-      }
-
-      return user;
+    if (errorList.length) {
+      throw (errorList);
     }
-    catch (err) {
-      throw(err);
+
+    let user = await userWrite.findByEmail(body.email);
+
+    if (user && user.email ==  body.email) {
+      throw([{param : 'email', message : 'There is an existing user connected to this email'}]);
     }
+
+    return _.pick(body, ['email', 'password', 'firstName', 'lastName']);
   }
 
-  * refreshToken (router) {
-    router.checkBody('refreshToken').notEmpty('Valid refresh token is required');
-
-    if (router.errors) {
-      throw(router.errors);
-    }
-
-    try {
-      let token = yield tokenWrite.findRow({
-        query: {
-          token : router.request.body.refreshToken,
-          expire: {
-            $gt: new Date()
-          }
+  async login (body) {
+    let errorList = validator.check(body, {
+      email: {
+        isEmail:  {
+          message: 'Valid email is required'
         }
-      });
-
-      if (!token) {
-        throw({param : 'refreshToken', msg : 'User not found'});
+      },
+      password: {
+        notEmpty: {
+          message: 'Valid password is required'
+        }
       }
+    });
 
-      return token;
+    if (errorList.length) {
+      throw (errorList);
     }
-    catch (err) {
-      throw(err);
+
+    let user = await userWrite.findByEmail(body.email);
+
+    if (!user) {
+      throw([{param : 'email', message : 'User not found'}]);
     }
+
+    if (userWrite.saltPassword(user.salt,body.password) !== user.password) {
+      throw([{param : 'password', message : 'User password is not correct'}]);
+    }
+
+    return _.pick(user,userFreeData);
   }
 
-
-  * changePassword (router) {
-    router.checkBody('oldPassword').notEmpty('Valid password is required');
-    router.checkBody('password').len(5, 20 ,'Password must be between 5-20 characters long');
-    router.checkBody('confirm').eq(router.request.body.password,'Confirm password mast be equals New password');
-
-    if (router.errors) {
-      throw(router.errors);
-    }
-
-    try {
-      let user = yield userWrite.findRow({
-        query: {
-          _id : router.request.user._id,
-          isDeleted: false
+  async refreshToken (body) {
+    let errorList = validator.check(body, {
+      refreshToken: {
+        notEmpty: {
+          message: 'Valid refresh token is required'
         }
-      });
-
-      if (!user) {
-        throw({msg : 'User not found'});
       }
+    });
 
-      if (userWrite.saltPassword(user.salt,router.request.body.oldPassword) !== user.password) {
-        throw({param : 'oldPassword', msg : 'User old password is not correct'});
+    if (errorList.length) {
+      throw (errorList);
+    }
+
+    let token = await tokenWrite.getNonExpiredToken(body.refreshToken);
+
+    if (!token) {
+      throw([{param : 'refreshToken', message : 'User not found'}]);
+    }
+
+    return _.pick(token,['_id', 'token', 'userId', 'expire', 'updatedAt', 'createdAt']);
+  }
+
+  async changePassword (body,user) {
+
+    let errorList = validator.check(body, {
+      password : {
+        isLength: {
+          options:{
+            min: 5,
+            max: 20,
+          },
+          message: 'Password must be between 5-20 characters long'
+        },
+      },
+
+      oldPassword : {
+        isLength: {
+          options:{
+            min: 5,
+            max: 20,
+          },
+          message: 'Old password must be between 5-20 characters long'
+        },
       }
+    });
 
-      return _.pick(router.request.body,['password']);
+    if (errorList.length) {
+      throw (errorList);
     }
-    catch (err) {
-      throw(err);
+
+    user = await userWrite.findById(user._id);
+
+    if (!user) {
+      throw([{ param : 'accessToken', message : 'User not found'}]);
     }
+
+    if (!user.salt || !user.password || userWrite.saltPassword(user.salt,body.oldPassword) !== user.password) {
+      throw([{param : 'oldPassword', message : 'User old password is not correct'}]);
+    }
+    return body.password;
   }
 
 }
 
-export let validateAccess = new ValidateAccess();
+export default new AccessValidate();

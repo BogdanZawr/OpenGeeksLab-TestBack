@@ -1,12 +1,22 @@
 import send from 'koa-send';
-import path from 'path';
 import koaRouter from 'koa-router';
 
+import config from '../config';
+
 export let router = koaRouter({
-  prefix: '/'
+  prefix: ''
 });
 
-router.get('*', function *(next) {
-  yield send(this, path.join(__dirname, '/../client/index.html'));
-  yield next;
-});
+router.get([
+    '/',
+  ], async (req,next) => {
+    await send(req, config.clientMainFile);
+    await next();
+  });
+
+/**
+  * @apiDefine accessTokenError
+  * @apiError {Object} AccessTokenIncorrect { param : 'accessToken', message : 'Access token is incorrect'}
+  * @apiError {Object} AccessTokenExpired { param : 'accessToken', message : 'Access token is expired'}
+  * @apiError {Object} UserNotFound { param : 'accessToken', message : 'User not found'}
+*/
