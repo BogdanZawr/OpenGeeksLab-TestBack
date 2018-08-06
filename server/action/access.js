@@ -54,7 +54,7 @@ class AccessAction {
   }
 
   async forgot(user) {
-    const pass = keygen.url(config.passwordLength);
+    const pass = keygen.url(config.password.passwordLength);
 
     const userData = await userWrite.changePassword(user._id, pass);
 

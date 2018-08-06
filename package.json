@@ -10,7 +10,6 @@
     "babel-eslint": "^8.2.6",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "chai": "^4.1.2",
-    "crypto": "^1.0.1",
     "eslint": "^5.2.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-babel": "^5.1.0",
@@ -30,6 +29,7 @@
     "nconf": "^0.10.0",
     "nodemon": "^1.18.3",
     "passport-http-bearer": "^1.0.1",
+    "pbkdf2": "^3.0.16",
     "q": "^1.5.1",
     "request": "^2.87.0",
     "validator": "^10.4.0"

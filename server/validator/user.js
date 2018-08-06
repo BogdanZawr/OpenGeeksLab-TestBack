@@ -6,7 +6,6 @@ import userWrite from '../model/write/user';
 import validator from '../component/validator';
 
 const userFreeData = [
-  '_id',
   'email',
   'firstName',
   'lastName',

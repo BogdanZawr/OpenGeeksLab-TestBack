@@ -1,14 +1,16 @@
-import crypto from 'crypto';
+import keygen from 'keygen';
+import pbkdf2 from 'pbkdf2';
 import * as _ from 'lodash';
 
 import db from '../../component/db';
 import token from '../../component/token';
+import config from "../../config/index";
 
 let userWrite = db.model('write', 'user');
 
 class UserWrite {
   hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString('base64');
+    const salt = keygen.url(config.password.saltLength);
     return {
       salt : salt,
       password : this.saltPassword(salt,password)
@@ -16,7 +18,7 @@ class UserWrite {
   }
 
   saltPassword(salt,password) {
-    return crypto.pbkdf2Sync(password, salt, 10000, 64,'sha1').toString('base64');
+    return pbkdf2.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');
   }
 
   update({query, data, callback}) {

@@ -62,6 +62,6 @@ router.all('/*', bearerMiddleware);
 router.put('/update', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
     let reqData = await userValidate.update(req.request.body, req.request.user);
-    return await userAction.update(reqData, req.request.user._id);
+    return userAction.update(reqData, req.request.user._id);
   })
 });

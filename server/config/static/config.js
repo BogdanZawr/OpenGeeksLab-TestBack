@@ -19,5 +19,8 @@ module.exports = {
   accessCode: {
     lifetime: 900000, //1000 * 60 * 15,
   },
-  passwordLength: 8,
+  password: {
+    passwordLength: 8,
+    saltLength: 16,
+  },
 };
