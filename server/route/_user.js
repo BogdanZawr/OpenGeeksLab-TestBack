@@ -13,7 +13,7 @@ router.all('/*', bearerMiddleware);
 
 /**
 
-  * @apiName UpdateUser
+  * @apiName UpdateUser-
   * @api {PUT} /api/v1/user/update User update
 
   * @apiVersion 0.0.1

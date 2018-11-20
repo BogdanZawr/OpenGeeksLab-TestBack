@@ -1,0 +1,14 @@
+import { Schema } from 'mongoose';
+import * as _ from 'lodash';
+
+import standardField from '../../component/db/dbStandardField';
+
+export default new Schema(
+  _.assignIn(
+    _.cloneDeep(standardField),
+    {
+      title: { type: String, required: true },
+      description: { type: String, required: true },
+      text: { type: String, required: true },
+      categoryId: { type: Schema.Types.ObjectId, required: true },
+    }));

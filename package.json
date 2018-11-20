@@ -39,7 +39,7 @@
     "postinstall": "npm run build && npm run doc",
     "build": "rm -rf dist && babel 'server/' -d 'dist/' --delete-dir-on-start --copy-files",
     "start": "nodemon --watch server --exec babel-node server/index.js",
-    "doc": "apidoc -i 'server/route' -o apidoc/",
+    "doc": "apidoc -i server/route -o apidoc/",
     "prod": "NODE_ENV=production node app.js",
     "test": "LAUNCH_TYPE=test ./node_modules/.bin/mocha --require babel-core/register ./server/test/index.js --recursive --no-timeouts --exit"
   }

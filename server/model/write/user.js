@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 
 import db from '../../component/db';
 import token from '../../component/token';
-import config from "../../config/index";
+import config from '../../config/index';
 
 let userWrite = db.model('write', 'user');
 
@@ -53,7 +53,7 @@ class UserWrite {
 
   findByEmail(email) {
     return userWrite.findRow({
-      query:{
+      query: {
         email,
         isDeleted: false,
       }

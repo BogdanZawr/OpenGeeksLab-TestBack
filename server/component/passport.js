@@ -16,8 +16,8 @@ passport.deserializeUser(function(user, done) {
   return done(null, user);
 });
 
-export let bearerMiddleware = async (req, next) => {
-  let deferred = q.defer();
+export const bearerMiddleware = async (req, next) => {
+  const deferred = q.defer();
 
   passport.authenticate('bearer', (err, user) => {
     if (err) {
@@ -25,7 +25,7 @@ export let bearerMiddleware = async (req, next) => {
     }
 
     if (!user) {
-      return deferred.reject([{ message:'User not found', param : 'accessToken' }]);
+      return deferred.reject([{ message: 'User not found', param : 'accessToken' }]);
     }
 
     deferred.resolve(user);

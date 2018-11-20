@@ -2,8 +2,9 @@ const hostUrl = process.env.HOST_URL || 'http://localhost:3000/';
 
 module.exports  =  {
   hostUrl: hostUrl,
-  mongoConnectionStrings : {
+  mongoConnectionStrings: {
     write: 'mongodb://localhost:27017/base-write',
+    read: 'mongodb://localhost:27017/base-read',
   },
   clientMainFile: '/apidoc/index.html',
   staticMaxAge: 0,

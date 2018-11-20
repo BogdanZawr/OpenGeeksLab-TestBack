@@ -26,8 +26,8 @@ let _parse = (initPath, callback) => {
 
 class Bootstrap {
   constructor() {
-    this.events();
     this.models();
+    this.events();
   }
 
   routes(application) {
