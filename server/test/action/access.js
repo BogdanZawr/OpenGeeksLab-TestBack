@@ -40,13 +40,13 @@ describe('action', () => {
     });
 
     describe('register', () => {
-	    it('create user', async () => {
-	    	userObj = await accessAction.register({
-	    		email: 'test3@mail.com',
-				  password: 'testAdmin',
-				  firstName: 'testAdmin',
-				  lastName: 'testAdmin',
-				  roles: ['user'],
+      it('create user', async () => {
+        userObj = await accessAction.register({
+          email: 'test3@mail.com',
+          password: 'testAdmin',
+          firstName: 'testAdmin',
+          lastName: 'testAdmin',
+          roles: ['user'],
         });
 
         expect(userObj).to.have.all.keys(fieldList.concat([

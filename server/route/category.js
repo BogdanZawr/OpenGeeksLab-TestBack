@@ -227,3 +227,69 @@ router.get('/categoryList/:id', async (req) => {
     return categoryAction.getCategoryList(reqData);
   });
 });
+
+/**
+  * @apiName FullInfo
+  * @api {GET} /api/v1/category/fullInfo/:id Full Info
+
+  * @apiVersion 0.0.1
+
+  * @apiGroup Category
+
+  * @apiHeader {String} Content-Type=application/json Content-Type
+
+  * @apiParam  {String} categoryId Id of category
+
+  * @apiExample {curl} Example usage:
+  *     curl 'http://localhost:8000/api/v1/category/fullInfo/5bea7f2a2a676b09b88fc5f4'
+  *      -H "Content-Type: application/json"
+  *      -X GET
+
+  * @apiSuccessExample {json} Success-Response:
+  [
+    {
+        "_id": "5c0677ce2a9b843ecb6667ad",
+        "isDeleted": false,
+        "title": "title",
+        "categoryId": "5c0677cb2a9b843ecb6667ab",
+        "createdAt": "2018-12-04T12:49:18.175Z",
+        "updatedAt": "2018-12-04T12:49:18.175Z",
+        "__v": 0,
+        "articles": [
+            {
+                "_id": "5c0677da2a9b843ecb6667b1",
+                "isDeleted": false,
+                "title": "title2",
+                "description": "text",
+                "text": "text",
+                "categoryId": "5c0677ce2a9b843ecb6667ad",
+                "createdAt": "2018-12-04T12:49:30.963Z",
+                "updatedAt": "2018-12-04T12:49:30.963Z",
+                "__v": 0
+            }
+        ],
+        "recipes": [
+            {
+                "_id": "5c0677d52a9b843ecb6667af",
+                "isDeleted": false,
+                "title": "title2",
+                "text": "text",
+                "categoryId": "5c0677ce2a9b843ecb6667ad",
+                "createdAt": "2018-12-04T12:49:25.761Z",
+                "updatedAt": "2018-12-04T12:49:25.761Z",
+                "__v": 0
+            }
+        ]
+    }
+]
+  * @apiUse categoryObject
+
+  * @apiError {Object} IdIsNotMongoId { param: "category", message: "_id is not mongoId" }
+  * @apiError {Object} CategoryNotFound { param: "category", message: "Category not found" }
+*/
+
+router.get('/fullInfo/:id', async (req) => {
+  await middlewareWrapper.wrape(req, null, async () => {
+    return categoryAction.categoryFullInfo(req.params.id);
+  });
+});

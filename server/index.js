@@ -6,8 +6,8 @@ import body from 'koa-body';
 import passport from 'koa-passport';
 import os from 'os';
 
-import bootstrap from './component/bootstrap';
 import config from './config';
+import bootstrap from './component/bootstrap';
 import secretKey from './component/secretKey';
 import token from './component/token';
 import start from './start';

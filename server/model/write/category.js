@@ -68,6 +68,73 @@ class CategoryWrite {
       },
     });
   }
+
+  categoryFullInfo(categoryId) {
+    return categoryWrite.aggregateRows({
+      query: [
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(categoryId),
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup:
+            {
+              from: 'articles',
+              let: {
+                id: '$_id',
+              },
+              pipeline: [
+                {
+                  $match: {
+                    isDeleted: false,
+                  },
+                },
+                {
+                  $match: {
+                    $expr: {
+                      $eq: [
+                        '$categoryId',
+                        '$$id',
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: 'articles',
+            },
+        },
+        {
+          $lookup:
+            {
+              from: 'recipes',
+              let: {
+                id: '$_id',
+              },
+              pipeline: [
+                {
+                  $match: {
+                    isDeleted: false,
+                  },
+                },
+                {
+                  $match: {
+                    $expr: {
+                      $eq: [
+                        '$categoryId',
+                        '$$id',
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: 'recipes',
+            },
+        },
+      ],
+    });
+  }
 }
 
 export default new CategoryWrite();

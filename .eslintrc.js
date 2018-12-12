@@ -5,7 +5,7 @@ module.exports = {
     'babel'
   ],
   'rules': {
-    'linebreak-style': ["error", "windows"],
+    'linebreak-style': ["error", "unix"],
     // 'prefer-const': 0,
     // 'spaced-comment': 0,
     'padded-blocks': 0,

@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 
 import ArticleWrite from '../model/write/article';
-import CategoryAction from './category';
+import eventBus from '../component/eventBus';
+import BreadcrumsRead from '../model/read/breadcrums';
 
 export class ArticleAction {
   constructor(model) {
@@ -16,12 +17,16 @@ export class ArticleAction {
     return this.model.findByCategoryId(categoryId);
   }
 
-  create(data) {
-    return this.model.create(data);
+  async create(data) {
+    const article = await this.model.create(data);
+    eventBus.emit('breadcrumsArticleRecipeUpdate', { data: article, type: 'article', isDelete: false });
+    return article;
   }
 
-  delete(_id) {
-    return this.model.delete(_id);
+  async delete(_id) {
+    const deleteItem = await this.model.delete(_id);
+    eventBus.emit('breadcrumsArticleRecipeUpdate', { data: deleteItem, type: 'article', isDelete: true });
+    return deleteItem;
   }
 
   update({ data, _id }) {
@@ -29,8 +34,8 @@ export class ArticleAction {
   }
 
   async getCategoryList(articleId) {
-    const article = await this.model.findById(articleId);
-    return CategoryAction.getCategoryList(article.categoryId);
+    const item = await BreadcrumsRead.findByArticleId(articleId);
+    return item.breadCrums;
   }
 }
 

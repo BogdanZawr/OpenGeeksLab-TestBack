@@ -1,4 +1,4 @@
-import mongoose, {Schema} from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import async from 'async';
 import * as _ from 'lodash';
 import path from 'path';
@@ -111,7 +111,7 @@ class DBList {
 
       _.keys(models[dbType]).forEach((name) => {
         if (config.LAUNCH_TYPE === 'test') {
-          this.models[dbType][name] = this.db[dbType].model(`${config.mongoDBTestCollectionPrefix}_${name}`, models[dbType][name])
+          this.models[dbType][name] = this.db[dbType].model(`${config.mongoDBTestCollectionPrefix}_${name}`, models[dbType][name]);
           return;
         }
 
@@ -128,12 +128,17 @@ class DBList {
     return this.dbList.isObjectId(id) ? mongoose.Types.ObjectId(id) : null;
   }
 
-  drop(callback) {
-    async.each(_.toArray(this.db), (connection, callback) => {
-      async.each(_.toArray(connection.collections), (collection, callback) => {
-        collection.drop(callback);
-      }, callback);
-    }, callback);
+  async drop() {
+    for (let dbType in this.db) {
+      for (let collection in this.db[dbType].collections) {
+        try {
+          await this.db[dbType].collections[collection].drop();
+        } catch(e) {
+          // console.log(this.db[dbType].collections[collection].name)
+          // console.log(e)
+        }
+      }
+    }
   }
 
   model(dbType, name) {

@@ -34,7 +34,7 @@ class CategoryRead {
 
   create(data) {
     return categoryRead.insertRow({
-      data,
+      data: _.assignIn(data, { updatedAt: new Date() }),
     });
   }
 

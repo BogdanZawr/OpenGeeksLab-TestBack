@@ -7,10 +7,10 @@ export default new Schema(
   _.assignIn(
     _.cloneDeep(standardField),
     {
-      title: { type: String, required: true },
       categoryId: { type: Schema.Types.ObjectId },
-      childIds: { type: Object, required: true },
-      children: { type: Array, required: true },
+      breadCrums: { type: Array, required: true },
+      recipeId: { type: Array, required: true },
+      articleId: { type: Array, required: true },
     },
   ),
 );

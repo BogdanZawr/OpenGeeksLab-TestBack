@@ -117,26 +117,27 @@ class CategoryValidate {
       if (!category) {
         throw ([{ param: 'category', message: 'Parent id not found' }]);
       }
+
       const allCategoryes = await categoryWrite.findAll();
       const categoryesIds = {};
 
       for (let i = 0; i < allCategoryes.length; i++) {
         categoryesIds[allCategoryes[i]._id] = allCategoryes[i];
       }
-      
+
       let currentCategory = categoryesIds[body.categoryId];
       while (currentCategory.categoryId) {
         const id = mongoose.Types.ObjectId(body._id);
         const currentId = mongoose.Types.ObjectId(currentCategory.categoryId);
-        
+
         if (currentId.equals(id)) {
           throw ([{ param: 'category', message: 'You cannot make a parent of a category out of a child of this category' }]);
         }
-        
+
         currentCategory = categoryesIds[currentCategory.categoryId];
       }
     }
-    
+
     return {
       data: _.pick(body, categoryFreeData),
       _id: body._id,

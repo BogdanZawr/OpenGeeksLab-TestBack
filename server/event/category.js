@@ -16,3 +16,28 @@ eventBus.onSeries('reBuildTree', async (data, next) => {
   }
   await next();
 });
+
+eventBus.onSeries('buildBreadcrums', async (data, next) => {
+  try {
+    await categoryAction.buildBreadcrums(data);
+  } catch (e) {
+  }
+  await next();
+});
+
+eventBus.onSeries('reBuildBreadcrums', async (data, next) => {
+  try {
+    await categoryAction.breadCrumsRebuild(data);
+  } catch (e) {
+  }
+  await next();
+});
+
+
+eventBus.onSeries('breadcrumsArticleRecipeUpdate', async (data, next) => {
+  try {
+    await categoryAction.breadcrumsArticleRecipeUpdate(data);
+  } catch (e) {
+  }
+  await next();
+});
