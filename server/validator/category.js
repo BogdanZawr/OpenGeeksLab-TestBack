@@ -4,27 +4,24 @@ import mongoose from 'mongoose';
 import categoryWrite from '../model/write/category';
 import validator from '../component/validator';
 
-const categoryFreeData = [
-  'title',
-  'categoryId',
-];
+const categoryFreeData = ['title', 'categoryId'];
 
 class CategoryValidate {
   async create(body) {
     const fullValidateObj = {
       categoryId: {
         isMongoId: {
-          message: 'categoryId is not mongoId',
-        },
-      },
+          message: 'categoryId is not mongoId'
+        }
+      }
     };
 
     const validateObj = {
       title: {
         notEmpty: {
-          message: 'Title is required',
-        },
-      },
+          message: 'Title is required'
+        }
+      }
     };
 
     if (body.categoryId !== null) {
@@ -36,14 +33,14 @@ class CategoryValidate {
     const errorList = validator.check(body, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     if (body.categoryId) {
       const categoryObj = await categoryWrite.findById(body.categoryId);
 
       if (!categoryObj) {
-        throw ([{ param: 'category', message: 'CategoryId not found' }]);
+        throw [{ param: 'category', message: 'CategoryId not found' }];
       }
     }
     return _.pick(body, categoryFreeData);
@@ -53,21 +50,21 @@ class CategoryValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'categoryId is not mongoId',
-        },
-      },
+          message: 'categoryId is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ _id }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     const categoryObj = await categoryWrite.findById(_id);
 
     if (!categoryObj) {
-      throw ([{ param: 'category', message: 'CategoryId not found' }]);
+      throw [{ param: 'category', message: 'CategoryId not found' }];
     }
 
     return _id;
@@ -77,22 +74,22 @@ class CategoryValidate {
     const fullValidateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild categoryId is not mongoId',
-        },
+          message: 'categoryId is not mongoId'
+        }
       },
       title: {
         notEmpty: {
-          message: 'Title is required',
-        },
-      },
+          message: 'Title is required'
+        }
+      }
     };
 
     const validateObj = {
       _id: {
         notEmpty: {
-          message: '_id is required',
-        },
-      },
+          message: '_id is required'
+        }
+      }
     };
 
     if (body.categoryId !== null) {
@@ -104,17 +101,23 @@ class CategoryValidate {
     const errorList = validator.check(body, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     if (body.categoryId === body._id) {
-      throw ([{ param: 'category', message: 'You cannot make a parent of the category of the same category' }]);
+      throw [
+        {
+          param: 'category',
+          message:
+            'You cannot make a parent of the category of the same category'
+        }
+      ];
     }
 
     if (body.categoryId) {
       const category = await categoryWrite.findById(body.categoryId);
       if (!category) {
-        throw ([{ param: 'category', message: 'Parent id not found' }]);
+        throw [{ param: 'category', message: 'Parent id not found' }];
       }
 
       const allCategoryes = await categoryWrite.findAll();
@@ -130,7 +133,13 @@ class CategoryValidate {
         const currentId = mongoose.Types.ObjectId(currentCategory.categoryId);
 
         if (currentId.equals(id)) {
-          throw ([{ param: 'category', message: 'You cannot make a parent of a category out of a child of this category' }]);
+          throw [
+            {
+              param: 'category',
+              message:
+                'You cannot make a parent of a category out of a child of this category'
+            }
+          ];
         }
 
         currentCategory = categoryesIds[currentCategory.categoryId];
@@ -139,7 +148,7 @@ class CategoryValidate {
 
     return {
       data: _.pick(body, categoryFreeData),
-      _id: body._id,
+      _id: body._id
     };
   }
 
@@ -147,22 +156,21 @@ class CategoryValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'categoryId is not mongoId',
-        },
-      },
+          message: 'categoryId is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ categoryId }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
-
 
     const categoryObj = await categoryWrite.findById(categoryId);
 
     if (!categoryObj) {
-      throw ([{ param: 'category', message: 'Category not found' }]);
+      throw [{ param: 'category', message: 'Category not found' }];
     }
 
     return categoryId;
