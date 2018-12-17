@@ -34,8 +34,11 @@ export class ArticleAction {
   }
 
   async getCategoryList(articleId) {
-    const item = await BreadcrumsRead.findByArticleId(articleId);
-    return item.breadCrums;
+    let item = await BreadcrumsRead.findByArticleId(articleId);
+    if (item) {
+      item = item.breadCrums;
+    }
+    return item;
   }
 }
 

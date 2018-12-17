@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import mongoose from 'mongoose';
 import { expect, assert } from 'chai';
 import categoryAction from '../../action/category';
-import categoryRead from '../../model/read/category';
 
 import { category } from '../init';
 import ArticleAction from '../../action/article';
@@ -529,6 +528,114 @@ describe('action', () => {
           expect(item).to.have.lengthOf(1);
         });
       });
+      describe('articles and recipes', () => {
+        before(async function() {
+          await categoryAction.breadcrumsArticleRecipeUpdate({
+            data: {
+            isDeleted: false,
+            _id: mongoose.Types.ObjectId('5c10fcb3049d7933a811f5b6'),
+            title: 'testBreadcrums',
+            text: 'testBreadcrums',
+            categoryId: mongoose.Types.ObjectId('5c0f7d1286ac101848217035'),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            __v: 0,
+          },
+          type: 'recipe',
+          isDelete: false,
+          });
+          await categoryAction.breadcrumsArticleRecipeUpdate({
+            data: {
+            isDeleted: false,
+            _id: mongoose.Types.ObjectId('5c10fca9049d7933a811f5b3'),
+            title: 'testBreadcrums',
+            text: 'testBreadcrums',
+            description: 'testBreadcrums',
+            categoryId: mongoose.Types.ObjectId('5c0f7d1286ac101848217035'),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            __v: 0,
+          },
+          type: 'article',
+          isDelete: false,
+          });
+        });
+
+        it('add new', async () => {
+          const recipeItem = await RecipeAction.getCategoryList(mongoose.Types.ObjectId('5c10fcb3049d7933a811f5b6'));
+          const articleItem = await ArticleAction.getCategoryList(mongoose.Types.ObjectId('5c10fca9049d7933a811f5b3'));
+
+          const recipeIndex = _.findIndex(recipeItem, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
+          const articleIndex = _.findIndex(articleItem, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
+
+          expect(recipeItem[recipeIndex]).to.have.all.keys([
+            'createdAt',
+            'updatedAt',
+            'categoryId',
+            '_id',
+            'title',
+            'isDeleted',
+            '__v',
+          ]);
+          expect(articleItem[articleIndex]).to.have.all.keys([
+            'createdAt',
+            'updatedAt',
+            'categoryId',
+            '_id',
+            'title',
+            'isDeleted',
+            '__v',
+          ]);
+
+          expect(recipeItem[recipeIndex]).to.have.property('isDeleted', false);
+          expect(recipeItem[recipeIndex]).to.have.property('title', 'testBreadcrums');
+          expect(recipeItem[recipeIndex]._id).to.deep.equal(mongoose.Types.ObjectId('5c0f7d1286ac101848217035'));
+          expect(recipeItem[recipeIndex].categoryId).to.deep.equal(mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'));
+
+          expect(articleItem[articleIndex]).to.have.property('isDeleted', false);
+          expect(articleItem[articleIndex]).to.have.property('title', 'testBreadcrums');
+          expect(articleItem[articleIndex]._id).to.deep.equal(mongoose.Types.ObjectId('5c0f7d1286ac101848217035'));
+          expect(articleItem[articleIndex].categoryId).to.deep.equal(mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'));
+        });
+        it('delete', async () => {
+          await categoryAction.breadcrumsArticleRecipeUpdate({
+            data: {
+              isDeleted: false,
+              _id: mongoose.Types.ObjectId('5c10fcb3049d7933a811f5b6'),
+              title: 'testBreadcrums',
+              text: 'testBreadcrums',
+              categoryId: mongoose.Types.ObjectId('5c0f7d1286ac101848217035'),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              __v: 0,
+            },
+            type: 'recipe',
+            isDelete: true,
+          });
+          await categoryAction.breadcrumsArticleRecipeUpdate({
+            data: {
+              isDeleted: false,
+              _id: mongoose.Types.ObjectId('5c10fca9049d7933a811f5b3'),
+              title: 'testBreadcrums',
+              text: 'testBreadcrums',
+              description: 'testBreadcrums',
+              categoryId: mongoose.Types.ObjectId('5c0f7d1286ac101848217035'),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              __v: 0,
+            },
+            type: 'article',
+            isDelete: true,
+          });
+
+          const recipeItem = await RecipeAction.getCategoryList(mongoose.Types.ObjectId('5c10fcb3049d7933a811f5b6'));
+          const articleItem = await ArticleAction.getCategoryList(mongoose.Types.ObjectId('5c10fca9049d7933a811f5b3'));
+
+          expect(recipeItem).to.be.a('null');
+          expect(articleItem).to.be.a('null');
+        });
+      });
+
       describe('delete', () => {
         before(async function() {
             await categoryAction.breadCrumsRebuild({
@@ -555,67 +662,19 @@ describe('action', () => {
               __v: 0,
             },
             _id: '5c0f7d0c86ac101848217032',
-            isDelete: false,
+            isDelete: true,
             });
         });
 
-        it('update breadcrums to child ', async () => {
+        it('delete child', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7d1286ac101848217035'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
 
-          expect(item[index]).to.have.all.keys([
-            'createdAt',
-            'updatedAt',
-            'categoryId',
-            '_id',
-            'title',
-            'isDeleted',
-            '__v',
-          ]);
-
-          expect(item[index]).to.have.property('isDeleted', false);
-          expect(item[index]).to.have.property('title', 'testBreadcrums');
-          expect(item[index]._id).to.deep.equal(mongoose.Types.ObjectId('5c0f7d1286ac101848217035'));
-          expect(item[index].categoryId).to.deep.equal(mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'));
-
-          expect(item[index + 1]).to.have.all.keys([
-            'createdAt',
-            'updatedAt',
-            'categoryId',
-            '_id',
-            'title',
-            'isDeleted',
-            '__v',
-          ]);
-
-          expect(item[index + 1]).to.have.property('isDeleted', false);
-          expect(item[index + 1]).to.have.property('title', 'testBreadcrums');
-          expect(item[index + 1]._id).to.deep.equal(mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'));
-          expect(item[index + 1].categoryId).to.deep.equal(null);
-
-          expect(item).to.have.lengthOf(2);
+          expect(item).to.be.a('null');
         });
-
-        it('update breadcrums to root ', async () => {
+        it('delete root', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7d0c86ac101848217032'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7d0c86ac101848217032')});
 
-          expect(item[index]).to.have.all.keys([
-            'createdAt',
-            'updatedAt',
-            'categoryId',
-            '_id',
-            'title',
-            'isDeleted',
-            '__v',
-          ]);
-
-          expect(item[index]).to.have.property('isDeleted', false);
-          expect(item[index]).to.have.property('title', 'testBreadcrums');
-          expect(item[index]._id).to.deep.equal(mongoose.Types.ObjectId('5c0f7d0c86ac101848217032'));
-          expect(item[index].categoryId).to.deep.equal(null);
-
-          expect(item).to.have.lengthOf(1);
+          expect(item).to.be.a('null');
         });
       });
     });

@@ -46,7 +46,6 @@ class CategoryValidate {
         throw ([{ param: 'category', message: 'CategoryId not found' }]);
       }
     }
-
     return _.pick(body, categoryFreeData);
   }
 

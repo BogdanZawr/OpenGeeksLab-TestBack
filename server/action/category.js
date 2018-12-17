@@ -158,7 +158,15 @@ class CategoryAction {
   }
 
   async buildBreadcrums(category) {
-    const itemBreadcrums = _.pick(category, ['isDeleted', '_id', 'title', 'categoryId', 'createdAt', 'updatedAt', '__v']);
+    const itemBreadcrums = _.pick(category, [
+      'isDeleted',
+      '_id',
+      'title',
+      'categoryId',
+      'createdAt',
+      'updatedAt',
+      '__v',
+    ]);
     const newData = {
       _id: category._id,
       breadCrums: [itemBreadcrums],
@@ -251,7 +259,6 @@ class CategoryAction {
   async breadcrumsArticleRecipeUpdate({ data, type, isDelete }) {
     const breadCrums = await BreadcrumsRead.findById(data.categoryId);
     let newData;
-
     if (type === 'recipe') {
       const { recipeId } = breadCrums;
       if (isDelete) {
@@ -277,31 +284,32 @@ class CategoryAction {
         articleId,
       };
     }
-
     await BreadcrumsRead.update(newData, data.categoryId);
   }
 
-  async BreadcrumsArticleRecipeDelete({ data, type }) {
-    const breadCrums = await BreadcrumsRead.findById(data.categoryId);
+  // async BreadcrumsArticleRecipeDelete({ data, type }) {
+  //   console.log(true);
 
-    let newData;
+  //   const breadCrums = await BreadcrumsRead.findById(data.categoryId);
 
-    if (type === 'recipe') {
-      const { recipeId } = breadCrums;
-      recipeId.push(data._id);
-      newData = {
-        recipeId,
-      };
-    } else if (type === 'article') {
-      const { articleId } = breadCrums;
-      articleId.push(data._id);
-      newData = {
-        articleId,
-      };
-    }
+  //   let newData;
 
-    await BreadcrumsRead.update(newData, data.categoryId);
-  }
+  //   if (type === 'recipe') {
+  //     const { recipeId } = breadCrums;
+  //     recipeId.push(data._id);
+  //     newData = {
+  //       recipeId,
+  //     };
+  //   } else if (type === 'article') {
+  //     const { articleId } = breadCrums;
+  //     articleId.push(data._id);
+  //     newData = {
+  //       articleId,
+  //     };
+  //   }
+
+  //   await BreadcrumsRead.update(newData, data.categoryId);
+  // }
 
   getAll() {
     return CategoryRead.findAll();
@@ -344,8 +352,11 @@ class CategoryAction {
   }
 
   async getCategoryList(categoryId) {
-    const item = await BreadcrumsRead.findByCategoryId(categoryId);
-    return item.breadCrums;
+    let item = await BreadcrumsRead.findByCategoryId(categoryId);
+    if (item) {
+      item = item.breadCrums;
+    }
+    return item;
   }
 
   categoryFullInfo(id) {

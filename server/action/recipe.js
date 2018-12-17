@@ -24,8 +24,11 @@ class RecipeAction extends ArticleAction {
   }
 
   async getCategoryList(recipeId) {
-    const item = await BreadcrumsRead.findByRecipeId(recipeId);
-    return item.breadCrums;
+    let item = await BreadcrumsRead.findByRecipeId(recipeId);
+    if (item) {
+      item = item.breadCrums;
+    }
+    return item;
   }
 }
 
