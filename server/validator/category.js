@@ -22,7 +22,7 @@ class CategoryValidate {
     const validateObj = {
       title: {
         notEmpty: {
-          message: 'Titleis required',
+          message: 'Title is required',
         },
       },
     };

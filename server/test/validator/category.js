@@ -54,19 +54,25 @@ describe('validator', () => {
           await CategoryValidate.create({
             title: 'test',
             categoryId: 'Not the mongoId',
-            userId: '5c13670c07c52023cd106691',
-            updatedAt: '2018-12-14T08:17:19.459Z',
-            password: true,
-            admin: true,
           });
         } catch (err) {
-          console.log(err[0]);
           expect(err[0]).to.have.property('param', 'categoryId');
           expect(err[0]).to.have.property('message', 'categoryId is not mongoId');
         }
+      });
+      it('title required', async () => {
+        try {
+          await CategoryValidate.create({
+            categoryId: '5c0f7cfd86ac10184821702f',
+          });
+        } catch (err) {
+          console.log(err);
+
+          expect(err[0]).to.have.property('param', 'title');
+          expect(err[0]).to.have.property('message', 'Title is required');
+        }
 
       });
-
     });
   });
 });
