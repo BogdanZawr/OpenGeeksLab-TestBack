@@ -1,13 +1,9 @@
 import * as _ from 'lodash';
-import mongoose from 'mongoose';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import CategoryValidate from '../../validator/category';
 import { category } from '../init';
 
 import CategoryAction from '../../action/category';
-import RecipeAction from '../../action/recipe';
-import { log } from 'util';
-import { loadavg } from 'os';
 
 describe('validator', () => {
   describe('category', () => {
@@ -172,6 +168,23 @@ describe('validator', () => {
             'categoryId is not mongoId'
           );
         }
+      });
+
+      it('response pick only the right keys', async () => {
+        const update = await CategoryValidate.update({
+          _id: category._id,
+          title: 'test',
+          categoryId: null,
+          userId: '5c13670c07c52023cd106691',
+          updatedAt: '2018-12-14T08:17:19.459Z',
+          password: true,
+          admin: true
+        });
+        expect(update).to.have.all.keys(['data', '_id']);
+
+        expect(update.data).to.have.property('title', 'test');
+        expect(update.data.categoryId).to.deep.equal(null);
+        expect(update._id).to.deep.equal(category._id);
       });
 
       it('_id is required', async () => {

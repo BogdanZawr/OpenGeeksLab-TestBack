@@ -6,13 +6,7 @@ import categoryWrite from '../model/write/category';
 
 import validator from '../component/validator';
 
-
-const categoryFreeData = [
-  'title',
-  'description',
-  'text',
-  'categoryId',
-];
+const categoryFreeData = ['title', 'description', 'text', 'categoryId'];
 
 export class ArticleValidate {
   constructor(model) {
@@ -23,36 +17,36 @@ export class ArticleValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild categoryId is not mongoId',
-        },
+          message: 'categoryId is not mongoId'
+        }
       },
       title: {
         notEmpty: {
-          message: 'Title is required',
-        },
+          message: 'Title is required'
+        }
       },
       description: {
         notEmpty: {
-          message: 'Description is required',
-        },
+          message: 'Description is required'
+        }
       },
       text: {
         notEmpty: {
-          message: 'Text required',
-        },
-      },
+          message: 'Text required'
+        }
+      }
     };
 
     const errorList = validator.check(body, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     const categoryObj = await categoryWrite.findById(body.categoryId);
 
     if (!categoryObj) {
-      throw ([{ param: 'category', message: 'CategoryId not found' }]);
+      throw [{ param: 'category', message: 'CategoryId not found' }];
     }
 
     return _.pick(body, categoryFreeData);
@@ -62,21 +56,21 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'vaild id is not mongoId',
-        },
-      },
+          message: 'vaild id is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ _id }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
-    const articleObj = await this.model.findById(_id);
+    const obj = await this.model.findById(_id);
 
-    if (!articleObj) {
-      throw ([{ param: 'category', message: 'Article not found' }]);
+    if (!obj) {
+      throw [{ param: 'delete', message: 'deleted object not found' }];
     }
 
     return _id;
@@ -86,39 +80,34 @@ export class ArticleValidate {
     const fullValidateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild categoryId is not mongoId',
-        },
+          message: 'vaild categoryId is not mongoId'
+        }
       },
       title: {
         notEmpty: {
-          message: 'Title is required',
-        },
+          message: 'Title is required'
+        }
       },
       description: {
         notEmpty: {
-          message: 'Titleis required',
-        },
+          message: 'Titleis required'
+        }
       },
       text: {
         notEmpty: {
-          message: 'Text is required',
-        },
-      },
+          message: 'Text is required'
+        }
+      }
     };
 
-    const fieldsList = [
-      'categoryId',
-      'title',
-      'description',
-      'text',
-    ];
+    const fieldsList = ['categoryId', 'title', 'description', 'text'];
 
     const validateObj = {
       _id: {
         notEmpty: {
-          message: '_id is required',
-        },
-      },
+          message: '_id is required'
+        }
+      }
     };
 
     for (const field of fieldsList) {
@@ -130,26 +119,26 @@ export class ArticleValidate {
     const errorList = validator.check(body, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     if (body.categoryId) {
       const categoryObj = await categoryWrite.findById(body.categoryId);
 
       if (!categoryObj) {
-        throw ([{ param: 'category', message: 'Category not found' }]);
+        throw [{ param: 'category', message: 'Category not found' }];
       }
     }
 
     const articleObj = await this.model.findById(body._id);
 
     if (!articleObj) {
-      throw ([{ param: 'recipe', message: 'Recipe not found' }]);
+      throw [{ param: 'recipe', message: 'Recipe not found' }];
     }
 
     return {
       data: _.pick(body, categoryFreeData),
-      _id: body._id,
+      _id: body._id
     };
   }
 
@@ -157,21 +146,21 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'Vaild categoryId is not mongoId',
-        },
-      },
+          message: 'Vaild categoryId is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ _id }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     const articleObj = await this.model.findById(_id);
 
     if (!articleObj) {
-      throw ([{ param: 'category', message: 'Article not found' }]);
+      throw [{ param: 'category', message: 'Article not found' }];
     }
 
     return _id;
@@ -181,23 +170,23 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'vaild id is not mongoId',
-        },
-      },
+          message: 'vaild id is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ _id }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     const articleObj = await this.model.findById(_id);
 
     if (!articleObj) {
-      throw ([{ param: 'recipe', message: 'Article not found' }]);
+      throw [{ param: 'recipe', message: 'Article not found' }];
     }
-    
+
     return articleObj;
   }
 
@@ -205,26 +194,25 @@ export class ArticleValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild id is not mongoId',
-        },
-      },
+          message: 'vaild id is not mongoId'
+        }
+      }
     };
 
     const errorList = validator.check({ categoryId }, validateObj);
 
     if (errorList.length) {
-      throw (errorList);
+      throw errorList;
     }
 
     const articleObj = await this.model.findByCategoryId(categoryId);
 
     if (!articleObj) {
-      throw ([{ param: 'recipe', message: 'Recipe not found' }]);
+      throw [{ param: 'recipe', message: 'Recipe not found' }];
     }
 
     return categoryId;
   }
-
 }
 
 export default new ArticleValidate(articleWrite);
