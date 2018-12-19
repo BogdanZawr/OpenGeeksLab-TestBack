@@ -85,7 +85,7 @@ describe('action', () => {
       let categoryToDelete;
       let parentCategory;
 
-      before(async function() {
+      before(async () => {
         categoryToDelete = await categoryAction.create({
           title: 'testForDelete',
           categoryId: null,
@@ -97,7 +97,7 @@ describe('action', () => {
         await ArticleAction.create({
           title: 'testForDelete',
           text: 'testForDelete',
-          description: "testForDelete",
+          description: 'testForDelete',
           categoryId: categoryToDelete._id,
         })
         await RecipeAction.create({
@@ -148,7 +148,7 @@ describe('action', () => {
     });
 
     describe('get category list', () => {
-      before(async function() {
+      before(async () => {
         await categoryAction.buildBreadcrums({
           isDeleted: false,
           _id: '5c1a5411756c7358dd3982a3',
@@ -202,7 +202,7 @@ describe('action', () => {
       let allTrees;
       let curentTree;
       describe('tree build', () => {
-        before(async function() {
+        before(async () => {
           await categoryAction.tree({
             isDeleted: false,
             _id: mongoose.Types.ObjectId('5c0a285f7b81250da0a914dd'),
@@ -299,7 +299,7 @@ describe('action', () => {
       });
       describe('tree update', () => {
         let treesAfterUpdate;
-        before(async function() {
+        before(async () => {
           await categoryAction.treeRebuild({
             category: {
               isDeleted: false,
@@ -330,7 +330,7 @@ describe('action', () => {
         });
 
         it('update child to null', async () => {
-          const index = _.findIndex(treesAfterUpdate, function(o) { return o._id.equals('5c0a4a90930c022186404f5e')});
+          const index = _.findIndex(treesAfterUpdate, (o) => { return o._id.equals('5c0a4a90930c022186404f5e')});
           const item = treesAfterUpdate[index];
           expect(item).to.have.all.keys([
             'createdAt',
@@ -352,8 +352,8 @@ describe('action', () => {
         });
 
         it('update child to child', async () => {
-          const index = _.findIndex(treesAfterUpdate, function(o) { return o._id.equals('5c0a285f7b81250da0a914dd')});
-          const indexOfChild = _.findIndex(treesAfterUpdate[index].children, function(o) { return o._id.equals('5c0a600adf02f73027379410')});
+          const index = _.findIndex(treesAfterUpdate, (o) => { return o._id.equals('5c0a285f7b81250da0a914dd')});
+          const indexOfChild = _.findIndex(treesAfterUpdate[index].children, (o) => { return o._id.equals('5c0a600adf02f73027379410')});
           const item = treesAfterUpdate[index].children[indexOfChild];
           expect(item).to.have.all.keys([
             'createdAt',
@@ -378,7 +378,7 @@ describe('action', () => {
     describe('breadcrums', () => {
       describe('create', () => {
         let treesAfterUpdate;
-        before(async function() {
+        before(async () => {
           await categoryAction.buildBreadcrums({
             isDeleted: false,
             _id: mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'),
@@ -410,7 +410,7 @@ describe('action', () => {
 
         it('create breadcrums ', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7cfd86ac10184821702f'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7cfd86ac10184821702f')});
+          const index = _.findIndex(item, (o) => { return o._id.equals('5c0f7cfd86ac10184821702f')});
           expect(item[index]).to.have.all.keys([
             'createdAt',
             'updatedAt',
@@ -430,7 +430,7 @@ describe('action', () => {
 
         it('create child breadcrums ', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7d0c86ac101848217032'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7d0c86ac101848217032')});
+          const index = _.findIndex(item, (o) => { return o._id.equals('5c0f7d0c86ac101848217032')});
 
           expect(item[index]).to.have.all.keys([
             'createdAt',
@@ -451,7 +451,7 @@ describe('action', () => {
       });
 
       describe('update', () => {
-        before(async function() {
+        before(async () => {
             await categoryAction.breadCrumsRebuild({
               category: {
               isDeleted: false,
@@ -482,7 +482,7 @@ describe('action', () => {
 
         it('update breadcrums to child ', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7d1286ac101848217035'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
+          const index = _.findIndex(item, (o) => { return o._id.equals('5c0f7d1286ac101848217035')});
 
           expect(item[index]).to.have.all.keys([
             'createdAt',
@@ -519,7 +519,7 @@ describe('action', () => {
 
         it('update breadcrums to root ', async () => {
           const item = await categoryAction.getCategoryList(mongoose.Types.ObjectId('5c0f7d0c86ac101848217032'));
-          const index = _.findIndex(item, function(o) { return o._id.equals('5c0f7d0c86ac101848217032')});
+          const index = _.findIndex(item, (o) => { return o._id.equals('5c0f7d0c86ac101848217032')});
 
           expect(item[index]).to.have.all.keys([
             'createdAt',
@@ -540,7 +540,7 @@ describe('action', () => {
         });
       });
       describe('articles and recipes', () => {
-        before(async function() {
+        before(async () => {
           await categoryAction.breadcrumsArticleRecipeUpdate({
             data: {
             isDeleted: false,
@@ -576,8 +576,8 @@ describe('action', () => {
           const recipeItem = await RecipeAction.getCategoryList(mongoose.Types.ObjectId('5c10fcb3049d7933a811f5b6'));
           const articleItem = await ArticleAction.getCategoryList(mongoose.Types.ObjectId('5c10fca9049d7933a811f5b3'));
 
-          const recipeIndex = _.findIndex(recipeItem, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
-          const articleIndex = _.findIndex(articleItem, function(o) { return o._id.equals('5c0f7d1286ac101848217035')});
+          const recipeIndex = _.findIndex(recipeItem, (o) => { return o._id.equals('5c0f7d1286ac101848217035')});
+          const articleIndex = _.findIndex(articleItem, (o) => { return o._id.equals('5c0f7d1286ac101848217035')});
 
           expect(recipeItem[recipeIndex]).to.have.all.keys([
             'createdAt',
@@ -648,7 +648,7 @@ describe('action', () => {
       });
 
       describe('delete', () => {
-        before(async function() {
+        before(async () => {
             await categoryAction.breadCrumsRebuild({
               category: {
               isDeleted: false,

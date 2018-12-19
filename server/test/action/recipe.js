@@ -10,23 +10,23 @@ describe('action', () => {
     let category;
     let recipe;
     let categoryForUpdate;
-    before(async function() {
+    before(async () => {
       category = await categoryAction.create({
         title: 'testCategoryForRecipe',
-        categoryId: null
+        categoryId: null,
       });
       categoryForUpdate = await categoryAction.create({
         title: 'testCategoryForRecipe',
-        categoryId: null
+        categoryId: null,
       });
       recipe = await RecipeAction.create({
         title: 'test',
         text: 'test',
-        categoryId: category._id
+        categoryId: category._id,
       });
     });
     describe('create', () => {
-      before(async function() {});
+      before(async () => {});
 
       it('recipe have all keys', async () => {
         expect(recipe).to.have.all.keys([
@@ -37,7 +37,7 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(recipe).to.have.property('isDeleted', false);
@@ -49,18 +49,18 @@ describe('action', () => {
     describe('update', () => {
       let updateRecipe;
       let updateCategoryId;
-      before(async function() {
-        let updatedRecipe = await RecipeAction.update({
+      before(async () => {
+        const updatedRecipe = await RecipeAction.update({
           data: { title: 'testUpdated' },
-          _id: recipe._id
+          _id: recipe._id,
         });
         updateRecipe = _.cloneDeep(updatedRecipe);
         updateCategoryId = await RecipeAction.update({
           data: {
             title: 'testUpdated',
-            categoryId: categoryForUpdate._id
+            categoryId: categoryForUpdate._id,
           },
-          _id: recipe._id
+          _id: recipe._id,
         });
       });
 
@@ -73,7 +73,7 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(updateRecipe).to.have.property('isDeleted', false);
@@ -90,14 +90,14 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(updateCategoryId).to.have.property('isDeleted', false);
         expect(updateCategoryId).to.have.property('title', 'testUpdated');
         expect(updateCategoryId.createdAt).to.not.equal(recipe.updatedAt);
         expect(updateCategoryId.categoryId).to.deep.equal(
-          categoryForUpdate._id
+          categoryForUpdate._id,
         );
       });
     });
@@ -111,7 +111,7 @@ describe('action', () => {
           '_id',
           'title',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(list).to.have.lengthOf(1);
@@ -129,7 +129,7 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(recipeItem).to.have.property('isDeleted', false);
@@ -142,7 +142,7 @@ describe('action', () => {
     describe('reipes by category', () => {
       it('recipe have all keys', async () => {
         const recipeArray = await RecipeAction.byCategory(
-          categoryForUpdate._id
+          categoryForUpdate._id,
         );
         expect(recipeArray[0]).to.have.all.keys([
           'createdAt',
@@ -152,7 +152,7 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(recipeArray[0]).to.have.property('isDeleted', false);
@@ -164,7 +164,7 @@ describe('action', () => {
 
     describe('delete', () => {
       let deleteRecipe;
-      before(async function() {
+      before(async () => {
         deleteRecipe = await RecipeAction.delete(recipe._id);
       });
 
@@ -177,7 +177,7 @@ describe('action', () => {
           'title',
           'text',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(deleteRecipe).to.have.property('isDeleted', true);

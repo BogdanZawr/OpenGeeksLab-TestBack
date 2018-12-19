@@ -12,7 +12,7 @@ describe('validator', () => {
     recipe = await RecipeAction.create({
       title: 'test',
       text: 'test',
-      categoryId: category._id
+      categoryId: category._id,
     });
   });
 
@@ -176,7 +176,7 @@ describe('validator', () => {
         expect(err[0]).to.have.property('message', '_id is not mongoId');
       }
     });
-    
+
     it('categoryId is not mongoId', async () => {
       try {
         await RecipeValidate.update({

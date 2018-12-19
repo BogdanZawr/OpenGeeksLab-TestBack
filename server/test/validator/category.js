@@ -11,7 +11,7 @@ describe('validator', () => {
     before(async () => {
       newCategory = await CategoryAction.create({
         title: 'test',
-        categoryId: null
+        categoryId: null,
       });
     });
 
@@ -134,11 +134,11 @@ describe('validator', () => {
       before(async () => {
         secondCategory = await CategoryAction.create({
           title: 'test',
-          categoryId: newCategory._id
+          categoryId: newCategory._id,
         });
         thirdCaregory = await CategoryAction.create({
           title: 'test',
-          categoryId: secondCategory._id
+          categoryId: secondCategory._id,
         });
       });
 

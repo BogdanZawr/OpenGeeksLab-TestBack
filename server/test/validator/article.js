@@ -201,7 +201,7 @@ describe('validator', () => {
         expect(err[0]).to.have.property('message', '_id is not mongoId');
       }
     });
-    
+
     it('categoryId is not mongoId', async () => {
       try {
         await ArticleValidate.update({
