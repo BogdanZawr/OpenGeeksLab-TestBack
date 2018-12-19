@@ -287,30 +287,6 @@ class CategoryAction {
     await BreadcrumsRead.update(newData, data.categoryId);
   }
 
-  // async BreadcrumsArticleRecipeDelete({ data, type }) {
-  //   console.log(true);
-
-  //   const breadCrums = await BreadcrumsRead.findById(data.categoryId);
-
-  //   let newData;
-
-  //   if (type === 'recipe') {
-  //     const { recipeId } = breadCrums;
-  //     recipeId.push(data._id);
-  //     newData = {
-  //       recipeId,
-  //     };
-  //   } else if (type === 'article') {
-  //     const { articleId } = breadCrums;
-  //     articleId.push(data._id);
-  //     newData = {
-  //       articleId,
-  //     };
-  //   }
-
-  //   await BreadcrumsRead.update(newData, data.categoryId);
-  // }
-
   getAll() {
     return CategoryRead.findAll();
   }

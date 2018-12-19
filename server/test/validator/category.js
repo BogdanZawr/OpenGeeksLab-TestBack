@@ -8,7 +8,7 @@ import CategoryAction from '../../action/category';
 describe('validator', () => {
   describe('category', () => {
     let newCategory;
-    before(async function() {
+    before(async () => {
       newCategory = await CategoryAction.create({
         title: 'test',
         categoryId: null
@@ -16,12 +16,12 @@ describe('validator', () => {
     });
 
     describe('create', () => {
-      before(async function() {});
+      before(async () => {});
 
       it('find parentId', async () => {
         const create = await CategoryValidate.create({
           title: 'test',
-          categoryId: newCategory._id
+          categoryId: newCategory._id,
         });
         expect(create).to.have.all.keys(['title', 'categoryId']);
 
@@ -32,7 +32,7 @@ describe('validator', () => {
       it('response have all keys', async () => {
         const create = await CategoryValidate.create({
           title: 'test',
-          categoryId: null
+          categoryId: null,
         });
         expect(create).to.have.all.keys(['title', 'categoryId']);
 
@@ -47,7 +47,7 @@ describe('validator', () => {
           userId: '5c13670c07c52023cd106691',
           updatedAt: '2018-12-14T08:17:19.459Z',
           password: true,
-          admin: true
+          admin: true,
         });
 
         expect(create).to.have.all.keys(['title', 'categoryId']);
@@ -60,13 +60,13 @@ describe('validator', () => {
         try {
           await CategoryValidate.create({
             title: 'test',
-            categoryId: 'Not the mongoId'
+            categoryId: 'Not the mongoId',
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'categoryId');
           expect(err[0]).to.have.property(
             'message',
-            'categoryId is not mongoId'
+            'categoryId is not mongoId',
           );
         }
       });
@@ -74,7 +74,7 @@ describe('validator', () => {
       it('title required', async () => {
         try {
           await CategoryValidate.create({
-            categoryId: '5c0f7cfd86ac10184821702f'
+            categoryId: '5c0f7cfd86ac10184821702f',
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'title');
@@ -86,7 +86,7 @@ describe('validator', () => {
         try {
           await CategoryValidate.create({
             title: 'test',
-            categoryId: '5c0f7cfd86ac10184821702d'
+            categoryId: '5c0f7cfd86ac10184821702d',
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'category');
@@ -96,7 +96,7 @@ describe('validator', () => {
     });
 
     describe('delete', () => {
-      before(async function() {});
+      before(async () => {});
 
       it('find parentId', async () => {
         const id = await CategoryValidate.delete(newCategory._id);
@@ -111,7 +111,7 @@ describe('validator', () => {
           expect(err[0]).to.have.property('param', '_id');
           expect(err[0]).to.have.property(
             'message',
-            'categoryId is not mongoId'
+            'categoryId is not mongoId',
           );
         }
       });
@@ -131,7 +131,7 @@ describe('validator', () => {
       let secondCategory;
       let thirdCaregory;
 
-      before(async function() {
+      before(async () => {
         secondCategory = await CategoryAction.create({
           title: 'test',
           categoryId: newCategory._id
@@ -146,7 +146,7 @@ describe('validator', () => {
         const res = await CategoryValidate.update({
           _id: secondCategory._id,
           categoryId: newCategory._id,
-          title: 'test'
+          title: 'test',
         });
         expect(res).to.have.all.keys(['data', '_id']);
 
@@ -159,13 +159,13 @@ describe('validator', () => {
         try {
           await CategoryValidate.update({
             _id: '5c0f7cfd86ac10184821702d',
-            categoryId: 'this is not mongoId'
+            categoryId: 'this is not mongoId',
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'categoryId');
           expect(err[0]).to.have.property(
             'message',
-            'categoryId is not mongoId'
+            'categoryId is not mongoId',
           );
         }
       });
@@ -178,7 +178,7 @@ describe('validator', () => {
           userId: '5c13670c07c52023cd106691',
           updatedAt: '2018-12-14T08:17:19.459Z',
           password: true,
-          admin: true
+          admin: true,
         });
         expect(update).to.have.all.keys(['data', '_id']);
 
@@ -190,7 +190,7 @@ describe('validator', () => {
       it('_id is required', async () => {
         try {
           await CategoryValidate.update({
-            categoryId: category._id
+            categoryId: category._id,
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', '_id');
@@ -202,13 +202,13 @@ describe('validator', () => {
         try {
           await CategoryValidate.update({
             _id: category._id,
-            categoryId: category._id
+            categoryId: category._id,
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'category');
           expect(err[0]).to.have.property(
             'message',
-            'You cannot make a parent of the category of the same category'
+            'You cannot make a parent of the category of the same category',
           );
         }
       });
@@ -217,13 +217,13 @@ describe('validator', () => {
         try {
           await CategoryValidate.update({
             _id: category._id,
-            categoryId: thirdCaregory._id
+            categoryId: thirdCaregory._id,
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'category');
           expect(err[0]).to.have.property(
             'message',
-            'You cannot make a parent of the category of the same category'
+            'You cannot make a parent of the category of the same category',
           );
         }
       });
@@ -232,7 +232,7 @@ describe('validator', () => {
         try {
           await CategoryValidate.update({
             _id: category._id,
-            categoryId: '5c0f7cfd86ac10184821702d'
+            categoryId: '5c0f7cfd86ac10184821702d',
           });
         } catch (err) {
           expect(err[0]).to.have.property('param', 'category');
@@ -242,7 +242,7 @@ describe('validator', () => {
     });
 
     describe('categoryList', () => {
-      before(async function() {});
+      before(async () => {});
 
       it('find parentId', async () => {
         const id = await CategoryValidate.categoryList(newCategory._id);
@@ -257,7 +257,7 @@ describe('validator', () => {
           expect(err[0]).to.have.property('param', 'categoryId');
           expect(err[0]).to.have.property(
             'message',
-            'categoryId is not mongoId'
+            'categoryId is not mongoId',
           );
         }
       });

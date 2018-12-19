@@ -1,12 +1,11 @@
 import * as _ from 'lodash';
 import mongoose from 'mongoose';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import categoryAction from '../../action/category';
 
 import { category } from '../init';
 import ArticleAction from '../../action/article';
 import RecipeAction from '../../action/recipe';
-import { log } from 'util';
 
 describe('action', () => {
   describe('category', () => {
@@ -149,8 +148,20 @@ describe('action', () => {
     });
 
     describe('get category list', () => {
+      before(async function() {
+        await categoryAction.buildBreadcrums({
+          isDeleted: false,
+          _id: '5c1a5411756c7358dd3982a3',
+          title: 'test',
+          categoryId: null,
+          createdAt: '2018-12-19T14:22:09.586Z',
+          updatedAt: '2018-12-19T14:22:09.586Z',
+          __v: 0,
+        });
+      });
+
       it('category have all keys and', async () => {
-        const req = await categoryAction.getCategoryList(category._id);
+        const req = await categoryAction.getCategoryList('5c1a5411756c7358dd3982a3');
 
         expect(req[0]).to.have.all.keys([
           'createdAt',

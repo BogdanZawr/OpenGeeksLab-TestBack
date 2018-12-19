@@ -1,17 +1,15 @@
 import * as _ from 'lodash';
-import mongoose from 'mongoose';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import categoryAction from '../../action/category';
 
 import ArticleAction from '../../action/article';
-import { log } from 'util';
 
 describe('action', () => {
   describe('article', () => {
     let category;
     let article;
     let categoryForUpdate;
-    before(async function() {
+    before(async () => {
       category = await categoryAction.create({
         title: 'testCategoryForArticle',
         categoryId: null
@@ -28,7 +26,7 @@ describe('action', () => {
       });
     });
     describe('create', () => {
-      before(async function() {});
+      before(async () => {});
 
       it('article have all keys', async () => {
         expect(article).to.have.all.keys([
@@ -40,7 +38,7 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(article).to.have.property('isDeleted', false);
@@ -52,7 +50,7 @@ describe('action', () => {
     describe('update', () => {
       let updateArticle;
       let updateCategoryId;
-      before(async function() {
+      before(async () => {
         let updatedArticle = await ArticleAction.update({
           data: { title: 'testUpdated' },
           _id: article._id
@@ -77,7 +75,7 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(updateArticle).to.have.property('isDeleted', false);
@@ -95,14 +93,14 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(updateCategoryId).to.have.property('isDeleted', false);
         expect(updateCategoryId).to.have.property('title', 'testUpdated');
         expect(updateCategoryId.createdAt).to.not.equal(article.updatedAt);
         expect(updateCategoryId.categoryId).to.deep.equal(
-          categoryForUpdate._id
+          categoryForUpdate._id,
         );
       });
     });
@@ -116,7 +114,7 @@ describe('action', () => {
           '_id',
           'title',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(list).to.have.lengthOf(1);
@@ -135,7 +133,7 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(ArticleItem).to.have.property('isDeleted', false);
@@ -148,7 +146,7 @@ describe('action', () => {
     describe('reipes by category', () => {
       it('Article have all keys', async () => {
         const ArticleArray = await ArticleAction.byCategory(
-          categoryForUpdate._id
+          categoryForUpdate._id,
         );
         expect(ArticleArray[0]).to.have.all.keys([
           'createdAt',
@@ -159,13 +157,13 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(ArticleArray[0]).to.have.property('isDeleted', false);
         expect(ArticleArray[0]).to.have.property('title', 'testUpdated');
         expect(ArticleArray[0].createdAt).to.not.equal(
-          ArticleArray[0].updatedAt
+          ArticleArray[0].updatedAt,
         );
         expect(ArticleArray[0].categoryId).to.deep.equal(categoryForUpdate._id);
       });
@@ -173,7 +171,7 @@ describe('action', () => {
 
     describe('delete', () => {
       let deleteArticle;
-      before(async function() {
+      before(async () => {
         deleteArticle = await ArticleAction.delete(article._id);
       });
 
@@ -187,7 +185,7 @@ describe('action', () => {
           'text',
           'description',
           'categoryId',
-          '__v'
+          '__v',
         ]);
 
         expect(deleteArticle).to.have.property('isDeleted', true);

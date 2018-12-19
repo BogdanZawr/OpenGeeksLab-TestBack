@@ -8,3 +8,4 @@ import './action/recipe';
 import './action/article';
 import './validator/category';
 import './validator/recipe';
+import './validator/article';

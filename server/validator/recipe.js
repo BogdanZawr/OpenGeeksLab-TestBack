@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import fs from 'fs';
 
 import recipeWrite from '../model/write/recipe';
 import categoryWrite from '../model/write/category';
@@ -14,19 +13,19 @@ class RecipeValidate extends ArticleValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'categoryId is not mongoId'
-        }
+          message: 'categoryId is not mongoId',
+        },
       },
       title: {
         notEmpty: {
-          message: 'Title is required'
-        }
+          message: 'Title is required',
+        },
       },
       text: {
         notEmpty: {
-          message: 'Text required'
-        }
-      }
+          message: 'Text required',
+        },
+      },
     };
 
     const errorList = validator.check(body, validateObj);
@@ -50,19 +49,19 @@ class RecipeValidate extends ArticleValidate {
     const fullValidateObj = {
       categoryId: {
         isMongoId: {
-          message: 'categoryId is not mongoId'
-        }
+          message: 'categoryId is not mongoId',
+        },
       },
       title: {
         notEmpty: {
-          message: 'Title is required'
-        }
+          message: 'Title is required',
+        },
       },
       text: {
         notEmpty: {
-          message: 'Text required'
-        }
-      }
+          message: 'Text required',
+        },
+      },
     };
 
     const fieldsList = ['categoryId', 'title', 'text'];
@@ -70,9 +69,12 @@ class RecipeValidate extends ArticleValidate {
     const validateObj = {
       _id: {
         notEmpty: {
-          message: '_id is required'
-        }
-      }
+          message: '_id is required',
+        },
+        isMongoId: {
+          message: '_id is not mongoId',
+        },
+      },
     };
 
     for (const field of fieldsList) {
@@ -103,7 +105,7 @@ class RecipeValidate extends ArticleValidate {
 
     return {
       data: _.pick(body, categoryFreeData),
-      _id: body._id
+      _id: body._id,
     };
   }
 }

@@ -17,24 +17,24 @@ export class ArticleValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'categoryId is not mongoId'
-        }
+          message: 'categoryId is not mongoId',
+        },
       },
       title: {
         notEmpty: {
-          message: 'Title is required'
-        }
+          message: 'Title is required',
+        },
       },
       description: {
         notEmpty: {
-          message: 'Description is required'
-        }
+          message: 'Description is required',
+        },
       },
       text: {
         notEmpty: {
-          message: 'Text required'
-        }
-      }
+          message: 'Text required',
+        },
+      },
     };
 
     const errorList = validator.check(body, validateObj);
@@ -56,9 +56,9 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'vaild id is not mongoId'
-        }
-      }
+          message: 'vaild id is not mongoId',
+        },
+      },
     };
 
     const errorList = validator.check({ _id }, validateObj);
@@ -80,24 +80,24 @@ export class ArticleValidate {
     const fullValidateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild categoryId is not mongoId'
-        }
+          message: 'vaild categoryId is not mongoId',
+        },
       },
       title: {
         notEmpty: {
-          message: 'Title is required'
-        }
+          message: 'Title is required',
+        },
       },
       description: {
         notEmpty: {
-          message: 'Titleis required'
-        }
+          message: 'Titleis required',
+        },
       },
       text: {
         notEmpty: {
-          message: 'Text is required'
-        }
-      }
+          message: 'Text is required',
+        },
+      },
     };
 
     const fieldsList = ['categoryId', 'title', 'description', 'text'];
@@ -105,9 +105,12 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         notEmpty: {
-          message: '_id is required'
+          message: '_id is required',
+        },
+        isMongoId: {
+          message: '_id is not mongoId'
         }
-      }
+      },
     };
 
     for (const field of fieldsList) {
@@ -133,12 +136,12 @@ export class ArticleValidate {
     const articleObj = await this.model.findById(body._id);
 
     if (!articleObj) {
-      throw [{ param: 'recipe', message: 'Recipe not found' }];
+      throw [{ param: '_id', message: 'obj not found' }];
     }
 
     return {
       data: _.pick(body, categoryFreeData),
-      _id: body._id
+      _id: body._id,
     };
   }
 
@@ -146,9 +149,12 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'Vaild categoryId is not mongoId'
-        }
-      }
+          message: 'vaild _id is not mongoId',
+        },
+        notEmpty: {
+          message: '_id is required',
+        },
+      },
     };
 
     const errorList = validator.check({ _id }, validateObj);
@@ -157,10 +163,10 @@ export class ArticleValidate {
       throw errorList;
     }
 
-    const articleObj = await this.model.findById(_id);
+    const obj = await this.model.findById(_id);
 
-    if (!articleObj) {
-      throw [{ param: 'category', message: 'Article not found' }];
+    if (!obj) {
+      throw [{ param: '_id', message: 'obj by _id not found' }];
     }
 
     return _id;
@@ -170,9 +176,12 @@ export class ArticleValidate {
     const validateObj = {
       _id: {
         isMongoId: {
-          message: 'vaild id is not mongoId'
-        }
-      }
+          message: 'vaild id is not mongoId',
+        },
+        notEmpty: {
+          message: '_id is required',
+        },
+      },
     };
 
     const errorList = validator.check({ _id }, validateObj);
@@ -184,7 +193,7 @@ export class ArticleValidate {
     const articleObj = await this.model.findById(_id);
 
     if (!articleObj) {
-      throw [{ param: 'recipe', message: 'Article not found' }];
+      throw [{ param: '_id', message: 'obj not found' }];
     }
 
     return articleObj;
@@ -194,9 +203,12 @@ export class ArticleValidate {
     const validateObj = {
       categoryId: {
         isMongoId: {
-          message: 'vaild id is not mongoId'
-        }
-      }
+          message: 'vaild id is not mongoId',
+        },
+        notEmpty: {
+          message: '_id is required',
+        },
+      },
     };
 
     const errorList = validator.check({ categoryId }, validateObj);
@@ -208,7 +220,7 @@ export class ArticleValidate {
     const articleObj = await this.model.findByCategoryId(categoryId);
 
     if (!articleObj) {
-      throw [{ param: 'recipe', message: 'Recipe not found' }];
+      throw [{ param: 'categoryId', message: 'category not found' }];
     }
 
     return categoryId;
