@@ -10,14 +10,20 @@ import RecipeAction from '../../action/recipe';
 describe('action', () => {
   describe('category', () => {
     let newCategory;
+    before(async () => {
+      newCategory = await categoryAction.create({
+        title: 'testUpdate',
+        categoryId: null,
+      });
+    });
     describe('create', () => {
       it('category have all keys', async () => {
-        newCategory = await categoryAction.create({
+        const obj = await categoryAction.create({
           title: 'testUpdate',
           categoryId: null,
         });
 
-        expect(newCategory).to.have.all.keys([
+        expect(obj).to.have.all.keys([
           'createdAt',
           'updatedAt',
           'isDeleted',
@@ -27,10 +33,10 @@ describe('action', () => {
           '__v',
         ]);
 
-        expect(newCategory).to.have.property('isDeleted', false);
-        expect(newCategory).to.have.property('categoryId', null);
-        expect(newCategory).to.have.property('title', 'testUpdate');
-        expect(newCategory.createdAt).to.deep.equal(newCategory.updatedAt);
+        expect(obj).to.have.property('isDeleted', false);
+        expect(obj).to.have.property('categoryId', null);
+        expect(obj).to.have.property('title', 'testUpdate');
+        expect(obj.createdAt).to.deep.equal(obj.updatedAt);
       });
 
       it('create parent category', async () => {

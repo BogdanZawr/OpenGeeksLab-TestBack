@@ -16,8 +16,6 @@ describe('validator', () => {
     });
 
     describe('create', () => {
-      before(async () => {});
-
       it('find parentId', async () => {
         const create = await CategoryValidate.create({
           title: 'test',
@@ -96,8 +94,6 @@ describe('validator', () => {
     });
 
     describe('delete', () => {
-      before(async () => {});
-
       it('find parentId', async () => {
         const id = await CategoryValidate.delete(newCategory._id);
         expect(id).to.deep.equal(newCategory._id);
@@ -242,8 +238,6 @@ describe('validator', () => {
     });
 
     describe('categoryList', () => {
-      before(async () => {});
-
       it('find parentId', async () => {
         const id = await CategoryValidate.categoryList(newCategory._id);
         expect(id).to.deep.equal(newCategory._id);

@@ -25,14 +25,6 @@ class ArticleWrite {
     });
   }
 
-  findAll() {
-    return articleWrite.findRows({
-      query: {
-        isDeleted: false,
-      },
-    });
-  }
-
   create({ title, text, description, categoryId }) {
     return articleWrite.insertRow({
       data: {

@@ -9,3 +9,7 @@ import './action/article';
 import './validator/category';
 import './validator/recipe';
 import './validator/article';
+import './model/write/category';
+import './model/write/article';
+import './model/write/recipe';
+import './model/read/breadcrums';

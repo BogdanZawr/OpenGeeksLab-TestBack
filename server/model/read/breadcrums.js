@@ -7,12 +7,6 @@ import db from '../../component/db';
 const breadcrumsRead = db.model('read', 'breadcrums');
 
 class BreadcrumsRead {
-  create(data) {
-    return breadcrumsRead.insertRow({
-      data,
-    });
-  }
-
   findById(_id) {
     return breadcrumsRead.findRow({
       query: {
@@ -26,6 +20,12 @@ class BreadcrumsRead {
       query: {
         _id,
       },
+      data,
+    });
+  }
+
+  create(data) {
+    return breadcrumsRead.insertRow({
       data,
     });
   }

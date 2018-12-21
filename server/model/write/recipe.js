@@ -25,14 +25,6 @@ class RecipeWrite {
     });
   }
 
-  findAll() {
-    return recipeWrite.findRows({
-      query: {
-        isDeleted: false,
-      },
-    });
-  }
-
   create({ title, text, categoryId }) {
     return recipeWrite.insertRow({
       data: {

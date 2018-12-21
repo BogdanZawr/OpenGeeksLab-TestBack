@@ -305,7 +305,7 @@ class CategoryAction {
   async delete(_id) {
     const category = await CategoryWrite.findById(_id);
 
-    await CategoryWrite.updateByParentId(
+    const log = await CategoryWrite.updateByParentId(
       _id,
       category.categoryId,
     );
