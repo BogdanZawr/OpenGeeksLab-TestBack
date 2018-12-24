@@ -9,7 +9,7 @@ import { ArticleValidate } from './article';
 const categoryFreeData = ['title', 'text', 'categoryId'];
 
 class RecipeValidate extends ArticleValidate {
-  async create(body) {
+  async create(body, roles) {
     const validateObj = {
       categoryId: {
         isMongoId: {

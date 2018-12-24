@@ -1,8 +1,8 @@
 import koaRouter from 'koa-router';
 
-import userAction  from '../action/user';
-import userValidate  from '../validator/user';
-import {bearerMiddleware} from '../component/passport';
+import userAction from '../action/user';
+import userValidate from '../validator/user';
+import { bearerMiddleware } from '../component/passport';
 import middlewareWrapper from '../component/middlewareWrapper';
 
 export let router = koaRouter({

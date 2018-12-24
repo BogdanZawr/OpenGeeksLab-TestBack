@@ -1,8 +1,8 @@
-import db from '../../component/db';
 import keygen from 'keygen';
+import db from '../../component/db';
 import config from '../../config';
 
-let tokenWrite = db.model('write', 'token');
+const tokenWrite = db.model('write', 'token');
 
 class TokenWrite {
   genNew(user) {
@@ -10,8 +10,8 @@ class TokenWrite {
       data: {
         token: keygen.url(config.token.refreshLength),
         userId: user._id,
-        expire: new Date(new Date().getTime() + config.token.refreshExpired)
-      }
+        expire: new Date(new Date().getTime() + config.token.refreshExpired),
+      },
     });
   }
 
@@ -19,7 +19,7 @@ class TokenWrite {
     return (await tokenWrite.findRow({
       query: {
         userId,
-      }
+      },
     })).token;
   }
 
@@ -28,9 +28,9 @@ class TokenWrite {
       query: {
         token,
         expire: {
-          $gt: new Date()
-        }
-      }
+          $gt: new Date(),
+        },
+      },
     });
   }
 
@@ -38,9 +38,9 @@ class TokenWrite {
     return tokenWrite.deleteRows({
       query: {
         expire: {
-          $lt: new Date()
-        }
-      }
+          $lt: new Date(),
+        },
+      },
     });
   }
 }

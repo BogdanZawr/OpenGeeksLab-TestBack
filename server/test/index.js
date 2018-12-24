@@ -13,3 +13,4 @@ import './model/write/category';
 import './model/write/article';
 import './model/write/recipe';
 import './model/read/breadcrums';
+import './model/read/category';

@@ -172,10 +172,16 @@ describe('action', () => {
     describe('delete', () => {
       let deleteArticle;
       before(async () => {
-        deleteArticle = await ArticleAction.delete(article._id);
+        const createArticle = await ArticleAction.create({
+          title: 'test',
+          text: 'test',
+          description: 'test',
+          categoryId: category._id,
+        });
+        deleteArticle = await ArticleAction.delete(createArticle._id);
       });
 
-      it('Article have all keys', async () => {
+      it('article have all keys', async () => {
         expect(deleteArticle).to.have.all.keys([
           'createdAt',
           'updatedAt',
@@ -189,9 +195,9 @@ describe('action', () => {
         ]);
 
         expect(deleteArticle).to.have.property('isDeleted', true);
-        expect(deleteArticle).to.have.property('title', 'testUpdated');
+        expect(deleteArticle).to.have.property('title', 'test');
         expect(deleteArticle.createdAt).to.not.equal(article.updatedAt);
-        expect(deleteArticle.categoryId).to.deep.equal(categoryForUpdate._id);
+        expect(deleteArticle.categoryId).to.deep.equal(category._id);
       });
     });
   });

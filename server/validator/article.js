@@ -43,6 +43,7 @@ export class ArticleValidate {
       throw errorList;
     }
 
+
     const categoryObj = await categoryWrite.findById(body.categoryId);
 
     if (!categoryObj) {

@@ -6,13 +6,12 @@ import categoryAction from '../action/category';
 import recipeAction from '../action/recipe';
 import articleAction from '../action/article';
 
-
 export let user;
 export let category;
 export let recipe;
 export let article;
 
-before(async function() {
+before(async () => {
   await secretKey.init();
   bootstrap.events();
   user = await accessAction.register({
@@ -30,18 +29,18 @@ before(async function() {
   recipe = await recipeAction.create({
     title: 'test',
     text: 'test',
-    categoryId: category._id
-  })
+    categoryId: category._id,
+  });
 
   article = await articleAction.create({
     title: 'test',
     text: 'test',
     description: 'test',
-    categoryId: category._id
-  })
+    categoryId: category._id,
+  });
 });
 
 
-after(async function() {
+after(async () => {
   await db.drop();
 });

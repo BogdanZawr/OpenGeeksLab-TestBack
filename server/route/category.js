@@ -2,12 +2,14 @@ import koaRouter from 'koa-router';
 
 import categoryValidate from '../validator/category'
 import categoryAction from '../action/category';
-import { bearerMiddleware } from '../component/passport';
+import { bearerMiddleware, rolesCheck } from '../component/passport';
 import middlewareWrapper from '../component/middlewareWrapper';
 
 export const router = koaRouter({
   prefix: '/api/v1/category',
 });
+
+router.all('/*', bearerMiddleware);
 
 /**
   * @apiDefine categoryObject
@@ -49,7 +51,10 @@ export const router = koaRouter({
 */
 
 router.get('/all', async (req) => {
-  await middlewareWrapper.wrape(req, null, () => categoryAction.getAll());
+  await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
+    await categoryAction.getAll();
+  });
 });
 
 /**
@@ -91,6 +96,7 @@ router.get('/all', async (req) => {
 
 router.post('/create', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeCreate', req.request.user);
     const reqData = await categoryValidate.create(req.request.body);
     return categoryAction.create(reqData);
   });
@@ -131,6 +137,7 @@ router.post('/create', async (req) => {
 
 router.delete('/delete/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeDelete', req.request.user);
     const reqData = await categoryValidate.delete(req.params.id);
     return categoryAction.delete(reqData);
   });
@@ -182,6 +189,7 @@ router.delete('/delete/:id', async (req) => {
 
 router.put('/update', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeUpdate', req.request.user);
     const reqData = await categoryValidate.update(req.request.body);
     return categoryAction.update(reqData);
   });
@@ -223,6 +231,7 @@ router.put('/update', async (req) => {
 
 router.get('/categoryList/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
     const reqData = await categoryValidate.categoryList(req.params.id);
     return categoryAction.getCategoryList(reqData);
   });
@@ -290,6 +299,7 @@ router.get('/categoryList/:id', async (req) => {
 
 router.get('/fullInfo/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
     return categoryAction.categoryFullInfo(req.params.id);
   });
 });

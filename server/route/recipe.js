@@ -1,12 +1,17 @@
 import koaRouter from 'koa-router';
 
-import recipeValidate from '../validator/recipe'
+import recipeValidate from '../validator/recipe';
+import { bearerMiddleware, rolesCheck } from '../component/passport';
 import recipeAction from '../action/recipe';
 import middlewareWrapper from '../component/middlewareWrapper';
+
 
 export const router = koaRouter({
   prefix: '/api/v1/recipe',
 });
+
+
+router.all('/*', bearerMiddleware);
 
 /**
   * @apiDefine recipeObject
@@ -54,8 +59,15 @@ export const router = koaRouter({
 */
 
 router.get('/item/:id', async (req) => {
-  await middlewareWrapper.wrape(req, null, () => recipeValidate.getItem(req.params.id));
+  await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
+    await recipeValidate.getItem(req.params.id);
+  });
 });
+
+// router.get('/item/:id', async (req) => {
+//   await middlewareWrapper.wrape(req, null, () => recipeValidate.getItem(req.params.id));
+// });
 
 /**
   * @apiName CreateRecipe
@@ -102,6 +114,7 @@ router.get('/item/:id', async (req) => {
 
 router.post('/create', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeCreate', req.request.user);
     const reqData = await recipeValidate.create(req.request.body);
     return recipeAction.create(reqData);
   });
@@ -143,6 +156,7 @@ router.post('/create', async (req) => {
 
 router.delete('/delete/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeDelete', req.request.user);
     const _id = await recipeValidate.delete(req.params.id);
     return recipeAction.delete(_id);
   });
@@ -195,6 +209,7 @@ router.delete('/delete/:id', async (req) => {
 
 router.put('/update', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeUpdate', req.request.user);
     const reqData = await recipeValidate.update(req.request.body);
     return recipeAction.update(reqData);
   });
@@ -243,6 +258,7 @@ router.put('/update', async (req) => {
 
 router.get('/categoryList/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
     const reqData = await recipeValidate.categoryList(req.params.id);
     return recipeAction.getCategoryList(reqData);
   });
@@ -286,6 +302,7 @@ router.get('/categoryList/:id', async (req) => {
 
 router.get('/byCategory/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('recipeRead', req.request.user);
     const reqData = await recipeValidate.byCategory(req.params.id);
     return recipeAction.byCategory(reqData);
   });

@@ -1,11 +1,8 @@
 import * as _ from 'lodash';
 import mongoose from 'mongoose';
 import { expect } from 'chai';
-import categoryAction from '../../../action/category';
-
-import { category } from '../../init';
+import * as init from '../../init';
 import BreadcrumsRead from '../../../model/read/breadcrums';
-import RecipeAction from '../../action/recipe';
 
 describe('model', () => {
   describe('read', () => {
@@ -18,27 +15,27 @@ describe('model', () => {
           breadCrums:
            [{
              isDeleted: false,
-             _id: '5c1ba06aca1ea34a6382580a',
+             _id: mongoose.Types.ObjectId('5c1ba06aca1ea34a6382580a'),
              title: 'test',
-             categoryId: '5c1ba06aca1ea34a63825808',
-             createdAt: '2018-12-20T14:00:10.659Z',
-             updatedAt: '2018-12-20T14:00:10.659Z',
+             categoryId: mongoose.Types.ObjectId('5c1ba06aca1ea34a63825808'),
+             createdAt: new Date(),
+             updatedAt: new Date(),
              __v: 0,
            },
            {
              isDeleted: false,
-             _id: '5c1ba06aca1ea34a63825808',
+             _id: mongoose.Types.ObjectId('5c1ba06aca1ea34a63825808'),
              title: 'test',
              categoryId: null,
-             createdAt: '2018-12-20T14:00:10.656Z',
-             updatedAt: '2018-12-20T14:00:10.656Z',
+             createdAt: new Date(),
+             updatedAt: new Date(),
              __v: 0,
            }],
           recipeId: [],
           articleId: [],
-          _id: '5c1ba06aca1ea34a6382580a',
-          updatedAt: '2018-12-20T14:00:10.659Z',
-          createdAt: '2018-12-20T14:00:10.659Z',
+          _id: mongoose.Types.ObjectId('5c1ba06aca1ea34a6382580a'),
+          updatedAt: new Date(),
+          createdAt: new Date(),
           __v: 0,
         });
         secondCategory = await BreadcrumsRead.create({
@@ -46,18 +43,18 @@ describe('model', () => {
           breadCrums:
            [{
              isDeleted: false,
-             _id: '5c1ba06aca1ea34a63825808',
+             _id: mongoose.Types.ObjectId('5c1ba06aca1ea34a63825808'),
              title: 'test',
              categoryId: null,
-             createdAt: '2018-12-20T14:00:10.656Z',
-             updatedAt: '2018-12-20T14:00:10.656Z',
+             createdAt: new Date(),
+             updatedAt: new Date(),
              __v: 0,
            }],
           recipeId: [],
           articleId: [],
-          _id: '5c1ba06aca1ea34a63825808',
-          updatedAt: '2018-12-20T14:00:10.659Z',
-          createdAt: '2018-12-20T14:00:10.659Z',
+          _id: mongoose.Types.ObjectId('5c1ba06aca1ea34a63825808'),
+          updatedAt: new Date(),
+          createdAt: new Date(),
           __v: 0,
         });
       });
@@ -203,17 +200,6 @@ describe('model', () => {
           '__v',
         ]);
 
-        expect(obj).to.have.all.keys([
-          'isDeleted',
-          'breadCrums',
-          'recipeId',
-          'articleId',
-          '_id',
-          'updatedAt',
-          'createdAt',
-          '__v',
-        ]);
-
         expect(obj.recipeId).to.be.empty;
         expect(obj.articleId).to.be.empty;
 
@@ -230,105 +216,96 @@ describe('model', () => {
         expect(obj.createdAt).to.not.equal(obj.updatedAt);
       });
 
-      // it('updateByParentId', async () => {
-      //   const res = await CategoryWrite.updateByParentId(secondCategory._id, firstCategory._id);
+      it('findByArticleId', async () => {
+        const { _id } = init.article;
+        const obj = await BreadcrumsRead.findByArticleId(_id);
 
-      //   expect(res).to.have.all.keys([
-      //     'n',
-      //     'nModified',
-      //     'ok',
-      //   ]);
+        expect(obj).to.have.all.keys([
+          'isDeleted',
+          'breadCrums',
+          'recipeId',
+          'articleId',
+          '_id',
+          'updatedAt',
+          'createdAt',
+          '__v',
+        ]);
 
-      //   expect(res.n).to.deep.equal(2);
-      //   expect(res.nModified).to.deep.equal(2);
-      //   expect(res.ok).to.deep.equal(1);
-      // });
+        expect(obj.recipeId).not.to.be.empty;
+        expect(obj.articleId).not.to.be.empty;
 
-      // it('findAll', async () => {
-      //   const arr = await CategoryWrite.findAll();
-      //   const index = _.findIndex(arr, o => o._id.equals(firstCategory._id));
+        expect(obj.breadCrums).not.to.be.empty.and.have.all.keys([
+          'isDeleted',
+          '_id',
+          'title',
+          'categoryId',
+          'createdAt',
+          'updatedAt',
+          '__v',
+        ]);
+        expect(obj._id).to.deep.equal(init.category._id);
+        expect(obj.createdAt).to.not.equal(obj.updatedAt);
+      });
 
-      //   expect(arr).to.be.an('array');
-      //   expect(arr).to.not.be.empty;
+      it('findByRecipeId', async () => {
+        const { _id } = init.recipe;
+        const obj = await BreadcrumsRead.findByRecipeId(_id);
 
-      //   expect(arr[index]).to.have.all.keys([
-      //     'createdAt',
-      //     'updatedAt',
-      //     'isDeleted',
-      //     '_id',
-      //     'title',
-      //     'categoryId',
-      //     '__v',
-      //   ]);
+        expect(obj).to.have.all.keys([
+          'isDeleted',
+          'breadCrums',
+          'recipeId',
+          'articleId',
+          '_id',
+          'updatedAt',
+          'createdAt',
+          '__v',
+        ]);
 
-      //   expect(arr[index]).to.have.property('isDeleted', false);
-      //   expect(arr[index]).to.have.property('title', 'test');
-      //   expect(arr[index].createdAt).to.not.equal(arr[index].updatedAt);
-      //   expect(arr[index].categoryId).to.deep.equal(null);
-      // });
+        expect(obj.recipeId).not.to.be.empty;
+        expect(obj.articleId).not.to.be.empty;
 
-      // it('create', async () => {
-      //   const obj = await CategoryWrite.create({
-      //     title: 'test',
-      //     categoryId: firstCategory,
-      //   });
+        expect(obj.breadCrums).not.to.be.empty.and.have.all.keys([
+          'isDeleted',
+          '_id',
+          'title',
+          'categoryId',
+          'createdAt',
+          'updatedAt',
+          '__v',
+        ]);
+        expect(obj._id).to.deep.equal(init.category._id);
+        expect(obj.createdAt).to.not.equal(obj.updatedAt);
+      });
 
-      //   expect(obj).to.have.all.keys([
-      //     'createdAt',
-      //     'updatedAt',
-      //     'isDeleted',
-      //     '_id',
-      //     'title',
-      //     'categoryId',
-      //     '__v',
-      //   ]);
+      it('findManyByField', async () => {
+        const { _id } = secondCategory;
+        const arr = await BreadcrumsRead.findManyByField(_id);
 
-      //   expect(obj).to.have.property('isDeleted', false);
-      //   expect(obj).to.have.property('title', 'test');
-      //   expect(obj.createdAt).to.not.equal(obj.updatedAt);
-      //   expect(obj.categoryId).to.deep.equal(firstCategory._id);
-      // });
+        expect(arr[0]).to.have.all.keys([
+          'isDeleted',
+          'breadCrums',
+          'recipeId',
+          'articleId',
+          '_id',
+          'updatedAt',
+          'createdAt',
+          '__v',
+        ]);
 
-      // it('delete', async () => {
-      //   const obj = await CategoryWrite.delete(secondCategory._id);
 
-      //   expect(obj).to.have.all.keys([
-      //     'createdAt',
-      //     'updatedAt',
-      //     'isDeleted',
-      //     '_id',
-      //     'title',
-      //     'categoryId',
-      //     '__v',
-      //   ]);
-
-      //   expect(obj).to.have.property('isDeleted', true);
-      //   expect(obj).to.have.property('title', 'test');
-      //   expect(obj.createdAt).to.not.equal(obj.updatedAt);
-      //   expect(obj.categoryId).to.deep.equal(null);
-      // });
-
-      // it('category full info', async () => {
-      //   const obj = await CategoryWrite.categoryFullInfo(category._id);
-
-      //   expect(obj[0]).to.have.all.keys([
-      //     'createdAt',
-      //     'updatedAt',
-      //     'isDeleted',
-      //     '_id',
-      //     'title',
-      //     'categoryId',
-      //     '__v',
-      //     'articles',
-      //     'recipes',
-      //   ]);
-
-      //   expect(obj[0]).to.have.property('isDeleted', false);
-      //   expect(obj[0]).to.have.property('title', 'test');
-      //   expect(obj[0].categoryId).to.deep.equal(null);
-      //   expect(obj[0].articles).to.be.an('array');
-      //   expect(obj[0].recipes).to.be.an('array');
-      // });
+        expect(arr[0].breadCrums).not.to.be.empty.and.have.all.keys([
+          'isDeleted',
+          '_id',
+          'title',
+          'categoryId',
+          'createdAt',
+          'updatedAt',
+          '__v',
+        ]);
+        expect(arr[0]._id).to.deep.equal(firstCategory._id);
+        expect(arr[0].createdAt).to.deep.equal(arr[0].updatedAt);
+      });
     });
   });
 });

@@ -1,70 +1,70 @@
 import * as _ from 'lodash';
 
-import userWrite  from '../model/write/user';
-import tokenWrite  from '../model/write/token';
+import userWrite from '../model/write/user';
+import tokenWrite from '../model/write/token';
 
-import validator  from '../component/validator';
+import validator from '../component/validator';
 
-let userFreeData = [
-    'createdAt',
-    'updatedAt',
-    'isDeleted',
-    'roles',
-    '_id',
-    'email',
-    'firstName',
-    'lastName',
+const userFreeData = [
+  'createdAt',
+  'updatedAt',
+  'isDeleted',
+  'roles',
+  '_id',
+  'email',
+  'firstName',
+  'lastName',
 ];
 
 class AccessValidate {
-  async forgot (body) {
-    let errorList = validator.check(body, {
+  async forgot(body) {
+    const errorList = validator.check(body, {
       email: {
-        isEmail:  {
-          message: 'Valid email is required'
-        }
-      }
+        isEmail: {
+          message: 'Valid email is required',
+        },
+      },
     });
 
     if (errorList.length) {
       throw (errorList);
     }
 
-    let user = await userWrite.findByEmail(body.email);
+    const user = await userWrite.findByEmail(body.email);
 
     if (!user) {
-      throw([{param : 'email', message : 'User not found'}]);
+      throw ([{ param: 'email', message: 'User not found' }]);
     }
 
-    return _.pick(user,userFreeData);
+    return _.pick(user, userFreeData);
   }
 
-  async register (body) {
+  async register(body) {
 
-    let errorList = validator.check(body, {
+    const errorList = validator.check(body, {
       email: {
-        isEmail:  {
-          message: 'Valid email is required'
-        }
+        isEmail: {
+          message: 'Valid email is required',
+        },
       },
-      password : {
+      password: {
         isLength: {
-          options:{
+          options: {
             min: 5,
             max: 20,
           },
-          message: 'Password must be between 5-20 characters long'
+          message: 'Password must be between 5-20 characters long',
         },
       },
       firstName: {
         notEmpty: {
-          message: 'First Name is required'
-        }
+          message: 'First Name is required',
+        },
       },
       lastName: {
         notEmpty: {
-          message: 'Last Name is required'
-        }
+          message: 'Last Name is required',
+        },
       },
     });
 
@@ -73,90 +73,90 @@ class AccessValidate {
       throw (errorList);
     }
 
-    let user = await userWrite.findByEmail(body.email);
+    const user = await userWrite.findByEmail(body.email);
 
-    if (user && user.email ==  body.email) {
-      throw([{param : 'email', message : 'There is an existing user connected to this email'}]);
+    if (user && user.email == body.email) {
+      throw ([{ param: 'email', message: 'There is an existing user connected to this email' }]);
     }
 
     return _.pick(body, ['email', 'password', 'firstName', 'lastName']);
   }
 
-  async login (body) {
-    let errorList = validator.check(body, {
+  async login(body) {
+    const errorList = validator.check(body, {
       email: {
-        isEmail:  {
-          message: 'Valid email is required'
-        }
+        isEmail: {
+          message: 'Valid email is required',
+        },
       },
       password: {
         notEmpty: {
-          message: 'Valid password is required'
-        }
-      }
+          message: 'Valid password is required',
+        },
+      },
     });
 
     if (errorList.length) {
       throw (errorList);
     }
 
-    let user = await userWrite.findByEmail(body.email);
+    const user = await userWrite.findByEmail(body.email);
 
     if (!user) {
-      throw([{param : 'email', message : 'User not found'}]);
+      throw ([{ param: 'email', message: 'User not found' }]);
     }
 
-    if (userWrite.saltPassword(user.salt,body.password) !== user.password) {
-      throw([{param : 'password', message : 'User password is not correct'}]);
+    if (userWrite.saltPassword(user.salt, body.password) !== user.password) {
+      throw ([{ param: 'password', message: 'User password is not correct' }]);
     }
 
-    return _.pick(user,userFreeData);
+    return _.pick(user, userFreeData);
   }
 
-  async refreshToken (body) {
-    let errorList = validator.check(body, {
+  async refreshToken(body) {
+    const errorList = validator.check(body, {
       refreshToken: {
         notEmpty: {
-          message: 'Valid refresh token is required'
-        }
-      }
+          message: 'Valid refresh token is required',
+        },
+      },
     });
 
     if (errorList.length) {
       throw (errorList);
     }
 
-    let token = await tokenWrite.getNonExpiredToken(body.refreshToken);
+    const token = await tokenWrite.getNonExpiredToken(body.refreshToken);
 
     if (!token) {
-      throw([{param : 'refreshToken', message : 'User not found'}]);
+      throw ([{ param: 'refreshToken', message: 'User not found' }]);
     }
 
-    return _.pick(token,['_id', 'token', 'userId', 'expire', 'updatedAt', 'createdAt']);
+    return _.pick(token, ['_id', 'token', 'userId', 'expire', 'updatedAt', 'createdAt']);
   }
 
-  async changePassword (body,user) {
+  async changePassword(body, user) {
 
-    let errorList = validator.check(body, {
-      password : {
+    const errorList = validator.check(body, {
+      password: {
         isLength: {
-          options:{
+          options: {
             min: 5,
             max: 20,
           },
-          message: 'Password must be between 5-20 characters long'
+          message: 'Password must be between 5-20 characters long',
         },
       },
 
-      oldPassword : {
+      oldPassword: {
         isLength: {
-          options:{
+          options: {
             min: 5,
             max: 20,
           },
-          message: 'Old password must be between 5-20 characters long'
+          message: 'Old password must be between 5-20 characters long',
         },
-      }
+      },
     });
 
     if (errorList.length) {
@@ -166,11 +166,11 @@ class AccessValidate {
     user = await userWrite.findById(user._id);
 
     if (!user) {
-      throw([{ param : 'accessToken', message : 'User not found'}]);
+      throw ([{ param: 'accessToken', message: 'User not found' }]);
     }
 
-    if (!user.salt || !user.password || userWrite.saltPassword(user.salt,body.oldPassword) !== user.password) {
-      throw([{param : 'oldPassword', message : 'User old password is not correct'}]);
+    if (!user.salt || !user.password || userWrite.saltPassword(user.salt, body.oldPassword) !== user.password) {
+      throw ([{ param: 'oldPassword', message: 'User old password is not correct' }]);
     }
     return body.password;
   }

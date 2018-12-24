@@ -148,7 +148,7 @@ class CategoryValidate {
 
     return {
       data: _.pick(body, categoryFreeData),
-      _id: body._id
+      _id: body._id,
     };
   }
 

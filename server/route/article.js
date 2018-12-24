@@ -3,10 +3,13 @@ import koaRouter from 'koa-router';
 import articleValidate from '../validator/article';
 import articleAction from '../action/article';
 import middlewareWrapper from '../component/middlewareWrapper';
+import { rolesCheck, bearerMiddleware } from '../component/passport';
 
 export const router = koaRouter({
   prefix: '/api/v1/article',
 });
+
+router.all('/*', bearerMiddleware);
 
 /**
   * @apiDefine articleObject
@@ -56,7 +59,10 @@ export const router = koaRouter({
 */
 
 router.get('/item/:id', async (req) => {
-  await middlewareWrapper.wrape(req, null, () => articleValidate.getItem(req.params.id));
+  await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleRead', req.request.user);
+    await articleValidate.getItem(req.params.id);
+  });
 });
 
 /**
@@ -108,6 +114,7 @@ router.get('/item/:id', async (req) => {
 
 router.post('/create', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleCreate', req.request.user);
     const reqData = await articleValidate.create(req.request.body);
     return articleAction.create(reqData);
   });
@@ -150,6 +157,7 @@ router.post('/create', async (req) => {
 
 router.delete('/delete/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleDelete', req.request.user);
     const _id = await articleValidate.delete(req.params.id);
     return articleAction.delete(_id);
   });
@@ -206,6 +214,7 @@ router.delete('/delete/:id', async (req) => {
 
 router.put('/update', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleUpdate', req.request.user);
     const reqData = await articleValidate.update(req.request.body);
     return articleAction.update(reqData);
   });
@@ -253,6 +262,7 @@ router.put('/update', async (req) => {
 
 router.get('/categoryList/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleRead', req.request.user);
     const reqData = await articleValidate.categoryList(req.params.id);
     return articleAction.getCategoryList(reqData);
   });
@@ -297,6 +307,7 @@ router.get('/categoryList/:id', async (req) => {
 
 router.get('/byCategory/:id', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
+    rolesCheck('articleRead', req.request.user);
     const reqData = await articleValidate.byCategory(req.params.id);
     return articleAction.byCategory(reqData);
   });

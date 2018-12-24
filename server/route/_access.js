@@ -1,9 +1,9 @@
-import accessAction  from '../action/access';
-import accessValidate  from '../validator/access';
+import koaRouter from 'koa-router';
+
+import accessAction from '../action/access';
+import accessValidate from '../validator/access';
 import { bearerMiddleware } from '../component/passport';
 import middlewareWrapper from '../component/middlewareWrapper';
-
-import koaRouter from 'koa-router';
 
 /**
   * @apiDefine userObject
@@ -19,8 +19,8 @@ import koaRouter from 'koa-router';
   * @apiSuccess  {String} [refreshToken] User refresh token
 */
 
-export let router = koaRouter({
-  prefix: '/api/v1/access'
+export const router = koaRouter({
+  prefix: '/api/v1/access',
 });
 
 /**
@@ -76,9 +76,9 @@ export let router = koaRouter({
 
 router.post('/register', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
-    let regData = await accessValidate.register(req.request.body);
+    const regData = await accessValidate.register(req.request.body);
     return await accessAction.register(regData);
-  })
+  });
 });
 
 /**
@@ -116,11 +116,11 @@ router.post('/register', async (req) => {
 */
 
 
-router.post('/forgot', async (req,next) => {
+router.post('/forgot', async (req, next) => {
   await middlewareWrapper.wrape(req, next, async () => {
-    let regData = await accessValidate.forgot(req.request.body);
+    const regData = await accessValidate.forgot(req.request.body);
     return await accessAction.forgot(regData);
-  })
+  });
 });
 
 
@@ -172,9 +172,9 @@ router.post('/forgot', async (req,next) => {
 
 router.post('/login', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
-    let regData = await accessValidate.login(req.request.body);
+    const regData = await accessValidate.login(req.request.body);
     return await accessAction.login(regData);
-  })
+  });
 });
 
 /**
@@ -223,13 +223,13 @@ router.post('/login', async (req) => {
 
 router.post('/refreshToken', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
-    let regData = await accessValidate.refreshToken(req.request.body);
+    const regData = await accessValidate.refreshToken(req.request.body);
     return await accessAction.refreshToken(regData);
   });
 });
 
-export let router2 = koaRouter({
-  prefix: '/api/v1/authAccess'
+export const router2 = koaRouter({
+  prefix: '/api/v1/authAccess',
 });
 
 router2.all('/*', bearerMiddleware);
@@ -276,9 +276,7 @@ router2.all('/*', bearerMiddleware);
 
 
 router2.get('/loginConfirm', async (req) => {
-  await middlewareWrapper.wrape(req, null, async () => {
-    return await accessAction.loginConfirm(req.request.user);
-  })
+  await middlewareWrapper.wrape(req, null, async () => await accessAction.loginConfirm(req.request.user));
 });
 
 /**
@@ -323,7 +321,7 @@ router2.get('/loginConfirm', async (req) => {
 
 router2.post('/changePassword', async (req) => {
   await middlewareWrapper.wrape(req, null, async () => {
-    let password = await accessValidate.changePassword(req.request.body, req.request.user);
+    const password = await accessValidate.changePassword(req.request.body, req.request.user);
     return await accessAction.changePassword(password, req.request.user);
-  })
+  });
 });

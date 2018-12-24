@@ -65,7 +65,9 @@ class BreadcrumsRead {
   findManyByField(_id) {
     return breadcrumsRead.findRows({
       query: {
-        _id: { $ne: mongoose.Types.ObjectId(_id) },
+        _id: {
+          $ne: mongoose.Types.ObjectId(_id),
+        },
         'breadCrums._id': mongoose.Types.ObjectId(_id),
       },
     });

@@ -6,22 +6,20 @@ import path from 'path';
 
 import config from '../config';
 
-const lastKey = 0; //number of latest key
+const lastKey = 0; // number of latest key
 
 class SecretKey {
-  get file () {
+  get file() {
     return path.join(__dirname, '/../../key.json');
   }
 
-  async confirmList () {
-    this.secretKeyList = _.slice(this.secretKeyList.sort((a, b) => {
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    }), 0, config.secretKey.keepCount);
+  async confirmList() {
+    this.secretKeyList = _.slice(this.secretKeyList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()), 0, config.secretKey.keepCount);
 
     fs.writeFileSync(this.file, JSON.stringify(this.secretKeyList));
   }
 
-  async init () {
+  async init() {
     if (fs.existsSync(this.file)) {
       try {
         this.secretKeyList = JSON.parse(fs.readFileSync(this.file));
@@ -29,7 +27,7 @@ class SecretKey {
         if (!this.secretKeyList.length) {
           await this.generateNew();
         } else {
-          for (let i in this.secretKeyList) {
+          for (const i in this.secretKeyList) {
             this.secretKeyList[i].createdAt = new Date(this.secretKeyList[i].createdAt);
           }
 
@@ -37,8 +35,7 @@ class SecretKey {
         }
 
         return;
-      }
-      catch (e) {
+      } catch (e) {
         await this.generateNew();
 
         return;
@@ -48,14 +45,13 @@ class SecretKey {
     await this.generateNew();
   }
 
-  async generateNew () {
+  async generateNew() {
     if (!this.secretKeyList || !_.isArray(this.secretKeyList)) {
       this.secretKeyList = [{
         key: keygen.url(config.secretKey.length),
         createdAt: new Date(),
       }];
-    }
-    else {
+    } else {
       this.secretKeyList.unshift({
         key: keygen.url(config.secretKey.length),
         createdAt: new Date(),
@@ -65,29 +61,28 @@ class SecretKey {
     this.confirmList();
   }
 
-  async scheduleStart () {
-    let that = this;
+  async scheduleStart() {
+    const that = this;
     setInterval(async () => {
       await that.generateNew();
-    },config.secretKey.lifetime);
+    }, config.secretKey.lifetime);
   }
 
-  async encrypt (data) {
+  async encrypt(data) {
     if (typeof data === 'object') {
       return aes256.encrypt(this.secretKeyList[lastKey].key, JSON.stringify(data));
     }
-    else {
+    
       throw 'Unable to encrypt token';
-    }
+    
   }
 
-  async decrypt (encrypted) {
-    for (let i in this.secretKeyList) {
+  async decrypt(encrypted) {
+    for (const i in this.secretKeyList) {
       try {
-        let decrypted = aes256.decrypt(this.secretKeyList[i].key, encrypted);
+        const decrypted = aes256.decrypt(this.secretKeyList[i].key, encrypted);
         return JSON.parse(decrypted);
-      }
-      catch (err) {
+      } catch (err) {
       }
     }
     throw 'Unable to decrypt token';

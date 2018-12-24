@@ -165,7 +165,12 @@ describe('action', () => {
     describe('delete', () => {
       let deleteRecipe;
       before(async () => {
-        deleteRecipe = await RecipeAction.delete(recipe._id);
+        const createRecipe = await RecipeAction.create({
+          title: 'test',
+          text: 'test',
+          categoryId: category._id,
+        });
+        deleteRecipe = await RecipeAction.delete(createRecipe._id);
       });
 
       it('recipe have all keys', async () => {
@@ -181,9 +186,9 @@ describe('action', () => {
         ]);
 
         expect(deleteRecipe).to.have.property('isDeleted', true);
-        expect(deleteRecipe).to.have.property('title', 'testUpdated');
+        expect(deleteRecipe).to.have.property('title', 'test');
         expect(deleteRecipe.createdAt).to.not.equal(recipe.updatedAt);
-        expect(deleteRecipe.categoryId).to.deep.equal(categoryForUpdate._id);
+        expect(deleteRecipe.categoryId).to.deep.equal(category._id);
       });
     });
   });
